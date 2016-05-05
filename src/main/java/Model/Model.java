@@ -13,6 +13,9 @@ public interface Model {
 	Engineer getEngineer(String id);
 	List<Engineer> getAllEngineers();
 	
+	String addCustomer(Request req);
+	List<Customer> getAllCustomers();
+	
 	
 }
 

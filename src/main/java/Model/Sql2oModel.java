@@ -18,29 +18,7 @@ public class Sql2oModel implements Model {
 		this.sql2o = sql2o;
 	}
 	
-	@Override
-	public String addUser(Request req) throws IllegalArgumentException{
-
-		String sql = "insert into users ( name, surname, phone, email,"
-				+ " user_types_id ) values ( :name, :surname, :phone," + " :email, :user_types_id )";
-		
-		
-		try (Connection con = sql2o.open()) {
-			return con.createQuery(sql, true).throwOnMappingFailure(false)
-					.addParameter("name", req.queryParams("name"))
-					.addParameter("surname", req.queryParams("surname"))
-					.addParameter("phone", req.queryParams("phone"))
-					.addParameter("email", req.queryParams("email"))
-					.addParameter("user_types_id",
-							Integer.parseInt(req.queryParams("user_types_id")))
-					.executeUpdate()
-					.getKey().toString();
-
-		}catch(IllegalArgumentException e){
-			return "Wrong parameters";
-		}
-		
-	}
+	
 
 	@Override
 	public Engineer getEngineer(String formId) {
@@ -109,5 +87,64 @@ public class Sql2oModel implements Model {
 			return null;
 		}
 	}
+	@Override
+	public String addUser(Request req) throws IllegalArgumentException{
+
+		String sql = "insert into users ( name, surname, phone, email,"
+				+ " user_types_id ) values ( :name, :surname, :phone," + " :email, :user_types_id )";
+		
+		
+		try (Connection con = sql2o.open()) {
+			return con.createQuery(sql, true).throwOnMappingFailure(false)
+					.addParameter("name", req.queryParams("name"))
+					.addParameter("surname", req.queryParams("surname"))
+					.addParameter("phone", req.queryParams("phone"))
+					.addParameter("email", req.queryParams("email"))
+					.addParameter("user_types_id",
+							Integer.parseInt(req.queryParams("user_types_id")))
+					.executeUpdate()
+					.getKey().toString();
+
+		}catch(IllegalArgumentException e){
+			return "Wrong parameters";
+		}
+		
+	}
+	
+	//Adds customer
+	@Override
+	public String addCustomer(Request req) {
+		
+		String sql = "insert into customers (name, address1, address2,"
+				+ " address3, suburb, state, postcode) values (:name, :address1,"
+				+ ":address2, :address3, :suburb, :state, :postcode)";
+		try (Connection con = sql2o.open()){
+			return con.createQuery(sql, true).throwOnMappingFailure(false)
+					.addParameter("name", req.queryParams("name"))
+					.addParameter("address1", req.queryParams("address1"))
+					.addParameter("address2", req.queryParams("address2"))
+					.addParameter("address3", req.queryParams("address3"))
+					.addParameter("suburb", req.queryParams("suburb"))
+					.addParameter("state", req.queryParams("state"))
+					.addParameter("postcode", req.queryParams("postcode"))
+					.executeUpdate()
+					.getKey().toString();
+		}catch(IllegalArgumentException e){
+			return "Wrong parameters";
+		}
+	}
+	
+	public List<Customer> getAllCustomers() {
+		
+		String sql = "select * from customers";
+		
+		try (Connection con = sql2o.open()){
+			return con.createQuery(sql).executeAndFetch(Customer.class);
+		}catch(Exception e){
+			return null;
+		}
+		
+	}
+	
 
 }
