@@ -1,11 +1,8 @@
+package controllers;
 import static spark.Spark.*;
 import com.google.gson.Gson;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
-import DAO.Dao;
-import Model.Sql2oModel;
+import model.Sql2oModel;
 
 public class Controller {
 	

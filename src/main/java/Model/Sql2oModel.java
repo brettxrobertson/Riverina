@@ -1,24 +1,22 @@
-package Model;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 
-import com.google.gson.Gson;
-
+import controllers.CustomerController;
+import controllers.EngineerController;
+import controllers.UserController;
 import spark.Request;
 
-public class Sql2oModel implements Model {
+public class Sql2oModel implements CustomerController,EngineerController,UserController {
 
 	private Sql2o sql2o;
 
 	public Sql2oModel(Sql2o sql2o) {
 		this.sql2o = sql2o;
 	}
-	
-	
 
 	@Override
 	public Engineer getEngineer(String formId) {
@@ -57,94 +55,22 @@ public class Sql2oModel implements Model {
 	}
 
 	@Override
-	public List<User> getUsers() {
+	public List<UserImpl> getUsers() {
 		
-		String sql = "select * from users";
 		
-		try (Connection con = sql2o.open()) {
-			return con.createQuery(sql).throwOnMappingFailure(false).executeAndFetch(User.class);
-		}catch(Exception e){
-			return null;
-		}
 	}
 
-	public User getUser(String formId) {
+	@Override
+	public UserImpl getUser(String formId) {
 		
-		int id =0;
-		try {
-			id = Integer.parseInt(formId);
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
 		
-		String sql = "select * from users where id = :id";
-		
-		try (Connection con = sql2o.open()) {
-			return con.createQuery(sql).throwOnMappingFailure(false)
-					.addParameter("id", id)
-					.executeAndFetch(User.class).get(0);
-		}catch(Exception e){
-			return null;
-		}
 	}
 	@Override
 	public String addUser(Request req) throws IllegalArgumentException{
 
-		String sql = "insert into users ( name, surname, phone, email,"
-				+ " user_types_id ) values ( :name, :surname, :phone," + " :email, :user_types_id )";
 		
-		
-		try (Connection con = sql2o.open()) {
-			return con.createQuery(sql, true).throwOnMappingFailure(false)
-					.addParameter("name", req.queryParams("name"))
-					.addParameter("surname", req.queryParams("surname"))
-					.addParameter("phone", req.queryParams("phone"))
-					.addParameter("email", req.queryParams("email"))
-					.addParameter("user_types_id",
-							Integer.parseInt(req.queryParams("user_types_id")))
-					.executeUpdate()
-					.getKey().toString();
-
-		}catch(IllegalArgumentException e){
-			return "Wrong parameters";
-		}
 		
 	}
 	
-	//Adds customer
-	@Override
-	public String addCustomer(Request req) {
-		
-		String sql = "insert into customers (name, address1, address2,"
-				+ " address3, suburb, state, postcode) values (:name, :address1,"
-				+ ":address2, :address3, :suburb, :state, :postcode)";
-		try (Connection con = sql2o.open()){
-			return con.createQuery(sql, true).throwOnMappingFailure(false)
-					.addParameter("name", req.queryParams("name"))
-					.addParameter("address1", req.queryParams("address1"))
-					.addParameter("address2", req.queryParams("address2"))
-					.addParameter("address3", req.queryParams("address3"))
-					.addParameter("suburb", req.queryParams("suburb"))
-					.addParameter("state", req.queryParams("state"))
-					.addParameter("postcode", req.queryParams("postcode"))
-					.executeUpdate()
-					.getKey().toString();
-		}catch(IllegalArgumentException e){
-			return "Wrong parameters";
-		}
-	}
 	
-	public List<Customer> getAllCustomers() {
-		
-		String sql = "select * from customers";
-		
-		try (Connection con = sql2o.open()){
-			return con.createQuery(sql).executeAndFetch(Customer.class);
-		}catch(Exception e){
-			return null;
-		}
-		
-	}
-	
-
 }

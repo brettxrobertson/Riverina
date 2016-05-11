@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 public class User {
 	
@@ -7,6 +7,7 @@ public class User {
 	private String surname;
 	private String phone;
 	private String email;
+	private int user_types_id;
 	
 	
 	
@@ -77,6 +78,18 @@ public class User {
 	 */
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	/**
+	 * @return the user_types_id
+	 */
+	public int getUser_types_id() {
+		return user_types_id;
+	}
+	/**
+	 * @param user_types_id the user_types_id to set
+	 */
+	public void setUser_types_id(int user_types_id) {
+		this.user_types_id = user_types_id;
 	}
 
 }
