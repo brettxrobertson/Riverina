@@ -29,10 +29,12 @@
 			<version>2.5</version>
 		</dependency>
 		<dependency>
- 			<groupId>org.slf4j</groupId>
-  			<artifactId>slf4j-simple</artifactId>
-  			<version>1.7.7</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.7</version>
 		</dependency>
-		
+		<!-- http://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+
+
 	</dependencies>
 </project>
