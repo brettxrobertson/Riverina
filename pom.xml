@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.88software.RIM</groupId>
+	<groupId>com.88software.Riverina</groupId>
 	<artifactId>rim</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>riverina-rmi</name>
@@ -33,7 +33,14 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.7</version>
 		</dependency>
-		<!-- http://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+		<!-- Hibernate -->
+     <!-- http://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+ 
+     <!-- http://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager -->
+ 
+ 
+     <!-- http://mvnrepository.com/artifact/org.hibernate/hibernate-c3p0 -->
+ 
 
 
 	</dependencies>
