@@ -1,3 +1,3 @@
 # Riverina
 
-Materials tracking
+Materials tracking and job management application.
