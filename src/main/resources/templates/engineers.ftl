@@ -1,5 +1,6 @@
 <html>
 <head>
+        <link href="css/bootstrap.css" rel="stylesheet" />
 </head>
 <body>
     
@@ -8,7 +9,6 @@
     <tr>
     
         <td>${engineer.name} ${engineer.surname}</td>
-    
     </tr>
 </#list>  
 </table>
