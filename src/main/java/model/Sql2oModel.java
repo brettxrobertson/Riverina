@@ -86,6 +86,19 @@ public class Sql2oModel implements CustomerController,EngineerController,UserCon
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/**
+	 * @return
+	 */
+	public List<Job> getAllJobs() {
+		
+		String sql = "select jobs.* from jobs";
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql).throwOnMappingFailure(false).executeAndFetch(Job.class);
+		}
+	}
 	
 	
 }

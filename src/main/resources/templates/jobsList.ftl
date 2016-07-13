@@ -3,7 +3,7 @@
         <link href="/css/bootstrap.css" rel="stylesheet" />
 </head>
 <body>
-    
+    <div>Session ID ${sessionId}</div>
     <table>
 <#list jobs as job>
     <tr>
