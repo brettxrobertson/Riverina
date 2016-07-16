@@ -21,6 +21,8 @@ public class Job implements java.io.Serializable {
 	private String notes;
 	private Set<Components> components = new HashSet<Components>(0);
 
+	/*
+	
 	public Job() {
 	}
 
@@ -41,7 +43,7 @@ public class Job implements java.io.Serializable {
 		this.notes = notes;
 		this.components = components;
 	}
-
+*/
 	public Integer getId() {
 		return this.id;
 	}

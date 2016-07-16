@@ -10,7 +10,7 @@
 <#list jobs as job>
     <tr>
     
-        <td>${job.description}</td>
+       <td>${job.jobName}</td>
     </tr>
 </#list>  
 </table>

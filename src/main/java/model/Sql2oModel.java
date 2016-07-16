@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 import org.sql2o.Connection;
+import org.sql2o.Query;
 import org.sql2o.Sql2o;
 
 import controllers.CustomerController;
@@ -33,7 +34,10 @@ public class Sql2oModel implements CustomerController,EngineerController,UserCon
 			
 			List<Engineer> engineerList = new ArrayList<Engineer>();
 			
-			engineerList = con.createQuery(sql).throwOnMappingFailure(false).addParameter("id", id)
+			engineerList = con.createQuery(sql)
+					.throwOnMappingFailure(false)
+					.setAutoDeriveColumnNames(true)
+					.addParameter("id", id)
 					.executeAndFetch(Engineer.class);
 			
 			return (Engineer) engineerList.get(0);
@@ -50,7 +54,10 @@ public class Sql2oModel implements CustomerController,EngineerController,UserCon
 
 		try (Connection con = sql2o.open()) {
 
-			return con.createQuery(sql).throwOnMappingFailure(false).executeAndFetch(Engineer.class);
+			return con.createQuery(sql)
+					.throwOnMappingFailure(false)
+					.setAutoDeriveColumnNames(true)
+					.executeAndFetch(Engineer.class);
 		}
 	}
 
@@ -92,11 +99,13 @@ public class Sql2oModel implements CustomerController,EngineerController,UserCon
 	 */
 	public List<Job> getAllJobs() {
 		
-		String sql = "select jobs.* from jobs";
+		String sql = "SELECT job_name from jobs";
 
 		try (Connection con = sql2o.open()) {
 
-			return con.createQuery(sql).throwOnMappingFailure(false).executeAndFetch(Job.class);
+			return con.createQuery(sql).throwOnMappingFailure(false)
+					.setAutoDeriveColumnNames(true)
+					.executeAndFetch(Job.class);
 		}
 	}
 	

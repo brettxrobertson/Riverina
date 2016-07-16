@@ -4,6 +4,7 @@ import static spark.Spark.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -11,7 +12,7 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import spark.ModelAndView;
 import spark.template.freemarker.FreeMarkerEngine;
-
+import model.Job;
 import model.Sql2oModel;
 
 public class Controller {
@@ -49,6 +50,8 @@ public class Controller {
 			return freeMarkerEngine.render(new ModelAndView(attributes, "factoryLogin.ftl"));
 
 		});
+		
+		
 		// gets all engineers JSON
 		get("/service/engineers", (request, response) -> model.getAllEngineers(), gson::toJson);
 
@@ -62,15 +65,16 @@ public class Controller {
 			response.status(200);
 			response.type("text/html");
 			
-			if(request.queryParams("sessionId") == null){
-				response.redirect("/");
-			}else{
+			if(request.queryParams("sessionId") == null && request.session().attribute("sessionId") == null){
+				response.redirect("/factoryLogin");
+			}else if(request.session().attribute("sessionId") == null){
 				request.session().attribute("sessionId",request.queryParams("sessionId"));
 			}
 			
 			Map<String, Object> attributes = new HashMap<>();
+			
 			attributes.put("jobs", model.getAllJobs());
-			attributes.put("sessionId", request.queryParams("sessionId"));
+			attributes.put("session",request.session());
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobsList.ftl"));
 		});
@@ -103,7 +107,15 @@ public class Controller {
 		// CUSTOMERS
 		post("/customers", (request, response) -> model.addCustomer(request));
 		get("/customers", (request, response) -> model.getAllCustomers());
-
+		
+		
+		//Session logout
+		get("/logout", (request, response) -> {
+            request.session().invalidate();
+            response.redirect("/");
+            return null;
+        });
+		
 	}
 
 }
