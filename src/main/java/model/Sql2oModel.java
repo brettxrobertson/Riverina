@@ -63,8 +63,16 @@ public class Sql2oModel implements CustomerController,EngineerController,UserCon
 
 	@Override
 	public List<User> getUsers() {
-		return null;
 		
+		String sql = "select users.* from users left join user_types on users.user_types_id = user_types.id";
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql)
+					.throwOnMappingFailure(false)
+					.setAutoDeriveColumnNames(true)
+					.executeAndFetch(User.class);
+		}
 		
 	}
 
@@ -93,17 +101,30 @@ public class Sql2oModel implements CustomerController,EngineerController,UserCon
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public List<Customer> getCustomerById(int customerId){
+		
+		String sql = "SELECT * from customers where id = :customerId";
+
+		try (Connection con = sql2o.open()) {
+			
+			return con.createQuery(sql)
+					.setAutoDeriveColumnNames(true)
+					.addParameter("customerId", customerId)
+					.executeAndFetch(Customer.class);
+		}
+	}
 
 	/**
 	 * @return
 	 */
 	public List<Job> getAllJobs() {
 		
-		String sql = "SELECT job_name from jobs";
+		String sql = "SELECT * from jobs";
 
 		try (Connection con = sql2o.open()) {
-
-			return con.createQuery(sql).throwOnMappingFailure(false)
+			
+			 return con.createQuery(sql).throwOnMappingFailure(false)
 					.setAutoDeriveColumnNames(true)
 					.executeAndFetch(Job.class);
 		}
