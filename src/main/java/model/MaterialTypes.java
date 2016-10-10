@@ -2,6 +2,7 @@ package model;
 // Generated Jun 17, 2016 11:36:27 AM by Hibernate Tools 5.1.0.Alpha1
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,7 +12,37 @@ public class MaterialTypes implements java.io.Serializable {
 
 	private Integer id;
 	private String description;
-	private String unitOfMeasure;
+	private String uom;
+	private Integer parentTypesId;
+	private Integer measurementPropertiesId;
+	/**
+	 * @return the uom
+	 */
+	public String getUom() {
+		return uom;
+	}
+
+	/**
+	 * @param uom the uom to set
+	 */
+	public void setUom(String uom) {
+		this.uom = uom;
+	}
+
+	/**
+	 * @return the measurementPropertiesId
+	 */
+	public Integer getMeasurementPropertiesId() {
+		return measurementPropertiesId;
+	}
+
+	/**
+	 * @param measurementPropertiesId the measurementPropertiesId to set
+	 */
+	public void setMeasurementPropertiesId(Integer measurementPropertiesId) {
+		this.measurementPropertiesId = measurementPropertiesId;
+	}
+
 	private Set defaultOperationses = new HashSet(0);
 	private Set materialses = new HashSet(0);
 
@@ -19,12 +50,12 @@ public class MaterialTypes implements java.io.Serializable {
 	}
 
 	public MaterialTypes(String unitOfMeasure) {
-		this.unitOfMeasure = unitOfMeasure;
+		this.uom = unitOfMeasure;
 	}
 
 	public MaterialTypes(String description, String unitOfMeasure, Set defaultOperationses, Set materialses) {
 		this.description = description;
-		this.unitOfMeasure = unitOfMeasure;
+		this.uom = unitOfMeasure;
 		this.defaultOperationses = defaultOperationses;
 		this.materialses = materialses;
 	}
@@ -46,16 +77,17 @@ public class MaterialTypes implements java.io.Serializable {
 	}
 
 	public String getUnitOfMeasure() {
-		return this.unitOfMeasure;
+		return this.uom;
 	}
 
 	public void setUnitOfMeasure(String unitOfMeasure) {
-		this.unitOfMeasure = unitOfMeasure;
+		this.uom = unitOfMeasure;
 	}
 
 	public Set getDefaultOperationses() {
 		return this.defaultOperationses;
 	}
+
 
 	public void setDefaultOperationses(Set defaultOperationses) {
 		this.defaultOperationses = defaultOperationses;
@@ -69,4 +101,26 @@ public class MaterialTypes implements java.io.Serializable {
 		this.materialses = materialses;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "MaterialTypes [id=" + id + ", description=" + description + ", unitOfMeasure=" + uom
+				+ ", defaultOperationses=" + defaultOperationses + ", materialses=" + materialses + "]";
+	}
+
+	/**
+	 * @return the parentTypeId
+	 */
+	public Integer getParentTypesId() {
+		return parentTypesId;
+	}
+
+	/**
+	 * @param parentTypeId the parentTypeId to set
+	 */
+	public void setParentTypesId(Integer parentTypeId) {
+		this.parentTypesId = parentTypeId;
+	}
 }

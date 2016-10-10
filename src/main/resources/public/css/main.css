@@ -1,0 +1,290 @@
+body {
+	font-family: "Open Sans";
+	overflow-x: hidden;
+    overflow-y: auto;
+    height: 768px;
+    width: 1024px;
+    position : relative;    
+}
+
+a:link, a:visited, a:hover, a:active {
+	color: black;
+    text-decoration: none;
+}
+
+.header {
+	background-color: rgba(214, 214, 214, 100);
+	width: 100%;
+	height: 70px;	
+}
+
+.page-title {
+	float: left;
+	margin-left: 10px;	
+	margin-top: 25px;
+	font-size: 250%;
+	font-weight: 100;
+	line-height: 20px;
+}
+
+.arrow-return {
+	margin-left: 10px;
+	margin-top: 10px;
+	background : url("../img/arrow.png");
+	float: left;
+	width: 35px; 
+	height: 50px;		
+}
+
+.home-btn {
+	margin-right: 10px;
+	margin-top: 10px;
+	background : url("../img/home.png");
+	float: right;
+	width: 62px; 
+	height: 49px;
+}
+
+.content {
+  box-sizing: border-box;
+  min-height: 90%;
+  padding-bottom: 90px;
+}
+
+.card-container {	
+	margin:0 auto;
+	margin-top: 55px;
+}
+
+.card {
+	float: left;
+    width: 224px;
+    height: 231px;    
+    margin-left: 20px;
+    margin-bottom: 20px;
+    background-color: rgba(214, 214, 214, 100);
+}
+
+.top-container {
+	width: 1000px;
+	height: 235px;
+	margin:0 auto; 
+	margin-top: 10px;
+	background-color: rgba(214, 214, 214, 100);
+	border-radius: 10px 10px 10px 10px;
+}
+
+.top-container-text {	
+	font-size: 900%;		
+	line-height: 300px;
+    margin-left: 50%;    
+}
+
+.bottom-container {
+	width: 100%;
+	height: 440px;	 
+	margin-top: 10px;
+	background-color: rgba(214, 214, 214, 100);	
+}
+
+.card-text {
+	padding-top: 5px;
+	margin: auto;
+    width: 50%;
+	font-size: 22px;	
+	line-height: 30px;
+}
+
+.category-card-text {S	
+	font-size: 24px;
+	font-weight: bold;	
+	line-height: 36px;
+	margin-left: 30%;
+	margin-top: 40%;		
+}
+
+.letter-text {
+	font-size: 24px;	
+	line-height: 50px;	
+	margin-top: 10%;
+}
+
+.one-letter-text {
+	margin-left: 30%;
+}
+
+.two-letter-text {
+	margin-left: 22%;
+}
+
+.circle {
+	background : url("../img/circle.png");
+	border-radius: 50%;
+	width: 117px;
+	height: 117px; 
+	margin-left: 25%;
+	margin-top: 10%;	
+}
+
+.calc-btn {
+	width: 280px;
+	height: 110px;
+	background-color: grey;	 
+}
+
+.middle-btn {
+	width: 200px;
+	height: 120px;
+	margin-top: 10px;
+	margin-left: 25px;
+	margin-right: 25px;
+	margin-bottom: 10px;
+	background-color: rgba(214, 214, 214, 100);	
+	border-radius: 10px 10px 10px 10px;
+	display: -webkit-inline-box;
+}
+
+.middle-btn-text {
+	width: 200px;
+	height: 120px;
+	font-size: 90px;	
+	line-height: 110px;
+	margin-left: 25px;	
+}
+
+.middle-btn:last-child {
+ 	width: 300px;
+}
+
+.footer-letter {
+	position: absolute;
+	background-color: silver;
+	width: 100%;
+	height: 70px;
+	margin-top: -70px;    	
+}
+
+.latters {
+	float:left;
+	margin-top: 8px;
+	margin-left: 10px;	
+	border-radius: 10px 10px 10px 10px;
+	background-color: grey;	
+	height: 54px; 
+}
+
+.one-letter {	
+	width: 60px;	
+}
+
+.two-letter {	
+	width: 100px;
+}
+
+.footer {
+	position: relative;
+	background-color: rgba(214, 214, 214, 100);
+	width: 50%;
+	height: 70px;
+	margin-top: -70px;
+}
+
+.footer-right {  	
+  	float: right;   
+}
+
+.btn {
+	height: 50px;
+    width: 50px;    
+}
+
+.btn-left {	
+	background : url("../img/left.png");	
+    margin-left: 50%;
+}
+
+.btn-right {
+ 	float: right;
+	background : url("../img/right.png");
+    margin-right: 50%;
+}
+.btn-left-grey {	
+	background : url("../img/left-grey.png");	
+    margin-left: 50%;
+}
+
+.btn-right-grey {
+ 	float: right;
+	background : url("../img/right-grey.png");
+    margin-right: 50%;
+}
+
+#enter_form {
+  width: 1024px;
+  height: 750px;
+  margin: 10px auto 0 auto;
+  background-color: #d6d6d6;  
+  border-radius: 5px;  
+}
+
+.result {
+  width: 1015px;
+  height: 190px;
+  float: left;
+  line-height: 40px;
+  background-color: #a5a5a5;
+  color: #fff;   
+  font-size: 120px; 
+}
+
+.clear, .nbr_btn, input {
+  float: left;
+  width: 240px;
+  height: 100px;
+  border-bottom: 3px solid grey;
+  border-radius: 10px;
+  text-align: center;
+  line-height: 100px;
+  cursor: pointer;   
+  font-size: 60pt;
+  background-color: #ecf0f1;
+  color: #000;
+  margin: 5px;
+} 
+
+.text_btn, .button, input[type=button] {	
+	font-size: 30pt;
+}
+
+.properties_btn {
+  width: 1024px;
+  height: 100px;
+  margin-bottom: 10px;
+  display: inline-flex;	
+}
+
+.properties_numbers {
+  width: 750px;  
+  margin-bottom: 10px;  
+}
+
+.properties_right {
+	width: 200px;
+	float: right;
+	margin-top: -440px;
+	margin-right: 75px;	
+	
+}
+
+.two_size_btn {
+	width: 495px;
+}
+
+.focus {
+    background: #a5a5a5;
+}
+
+.view {
+	font-size: 80; 
+}
+

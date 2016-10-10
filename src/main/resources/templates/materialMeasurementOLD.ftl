@@ -28,14 +28,37 @@
     
 
  
-    <div>Session ID ${session.attribute("sessionId")}</div>
+<div>Session ID ${session.attribute("sessionId")}</div>
   
-<#list jobs as job>
-   <a href="/materialTypes" class="button">
-   <span>${job.jobName}</span>
-   
-</#list>  
+<div>
+<input type="number" pattern="[0-9]*" inputmode="numeric" style="width:150px;">
 
+</div>
+
+<div class="container">
+    
+    <form role="form">
+    <div>
+    <#list materialTypeMeasurementProperties as properties>
+
+        <div class="row">
+            <div class="form-group">
+					<label>${properties.description}</label>
+   					<input type="RADIO" name='propertyId' value="${properties.measurement_properties_id}"class="form-control input-lg">
+   
+				
+            </div>
+        </div>
+	</#list>
+	</div>
+        <div class="row">
+            <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+    </form>
+</div>
+<div>
+
+</div>
 
 <a href="/logout" class="button">
 <span>LOGOUT</span>

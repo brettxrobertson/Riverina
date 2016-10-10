@@ -19,6 +19,9 @@ public class Materials implements java.io.Serializable {
 	private String salePrice;
 	private Set materialsUsages = new HashSet(0);
 	private Set purchaseOrderLineItemses = new HashSet(0);
+	
+	private  int materialTypesId;
+	
 
 	public Materials() {
 	}
@@ -112,6 +115,20 @@ public class Materials implements java.io.Serializable {
 
 	public void setPurchaseOrderLineItemses(Set purchaseOrderLineItemses) {
 		this.purchaseOrderLineItemses = purchaseOrderLineItemses;
+	}
+
+	/**
+	 * @return the materialTypesId
+	 */
+	public int getMaterialTypesId() {
+		return materialTypesId;
+	}
+
+	/**
+	 * @param materialTypesId the materialTypesId to set
+	 */
+	public void setMaterialTypesId(int materialTypesId) {
+		this.materialTypesId = materialTypesId;
 	}
 
 }

@@ -61,7 +61,7 @@ public class Job implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Customer getCustomers(Sql2oModel model) {
+	public Customer getCustomers() {
 		
 		return this.customer;
 	}

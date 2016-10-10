@@ -26,15 +26,22 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/js/bootstrap.min.js"></script>
     
-
- 
+    
     <div>Session ID ${session.attribute("sessionId")}</div>
   
-<#list jobs as job>
-   <a href="/materialTypes" class="button">
-   <span>${job.jobName}</span>
-   
-</#list>  
+<div class="content" id="content">
+  <div class="card-container">
+  	 <#list materialTypes as category>
+  	 <a /href='/materialTypes/${category.id}' class='button'>
+	  	<div class="card">	  		
+  				<div class="category-card-text">
+  					<span>${category.description}</span>
+				</div>				
+  			</div>
+    </#list>
+  </div>
+    
+</div>
 
 
 <a href="/logout" class="button">
