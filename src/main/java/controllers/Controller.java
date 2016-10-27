@@ -1,36 +1,34 @@
 package controllers;
 
 import static spark.Spark.*;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
+import org.sql2o.logging.SysOutLogger;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.Data;
 import com.google.gson.Gson;
+
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import spark.ModelAndView;
 import spark.template.freemarker.FreeMarkerEngine;
-import model.Customer;
-import model.Job;
+import model.MaterialPropPayLoad;
 import model.MaterialTypes;
-import model.Materials;
 import model.MeasurementProperty;
 import model.Sql2oModel;
 
 public class Controller {
 
-	/**
-	 * @param model
-	 */
-	/**
-	 * @param model
-	 */
 	/**
 	 * @param model
 	 */
@@ -139,8 +137,6 @@ public class Controller {
 			attributes.put("session", request.session());
 			attributes.put("userScreenDescription", "Select Materials");
 			attributes.put("userScreenHomeLocation", "initial.html");
-			
-			
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "material_types.ftl"));
 		});
@@ -152,10 +148,9 @@ public class Controller {
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("userScreenDescription", "Select Materials");
 			attributes.put("userScreenHomeLocation", "initial.html");
-			
-			
+
 			MaterialTypes materialType;
-			
+
 			/*
 			 * If this material type has children types add them to the
 			 * materialTypes object. Redirect to /addMaterialMeasurement/:id
@@ -169,7 +164,7 @@ public class Controller {
 					attributes.put("session", request.session());
 
 					return freeMarkerEngine.render(new ModelAndView(attributes, "material_types.ftl"));
-					
+
 				} else {
 					attributes.put("materialTypes", materialType);
 					attributes.put("session", request.session());
@@ -185,16 +180,7 @@ public class Controller {
 			}
 			return null;
 		});
-		
-		
-		// Session logout
-		post("/*", (request, response) -> {
-					
-					System.out.println(request.queryString());
-					
-					return null;
-		});
-		
+
 		// Add material measurements
 		get("/materialMeasurement/:id", (request, response) -> {
 
@@ -208,31 +194,44 @@ public class Controller {
 			// Attribute Map for session variables
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-
-			
-//			List<Map<String, Object>> materialTypeMeasurementProperties = model
-//					.getMaterialMeasurementProperties(materialId);
+			attributes.put("userScreenDescription", "Select size and qty");
+			attributes.put("userScreenHomeLocation", "initial.html");
 
 			List<MeasurementProperty> materialTypeMeasurementProperties = model
 					.getMaterialMeasurementProperties(materialId);
 
-//			for (MeasurementProperty entry : materialTypeMeasurementProperties) {
-//				
-//				Set<Entry<String, Object>> set = entry.entrySet();
-//				
-//				Iterator<Entry<String, Object>> i = set.iterator();
-//				
-//				while(i.hasNext()){
-//					Map.Entry<String, Object> me = (Map.Entry<String, Object>)i.next();
-//					System.out.println("Key " + me.getKey() + " Value " + me.getValue());
-//				}
-//			}
-			
-			
-
 			attributes.put("materialTypeMeasurementProperties", materialTypeMeasurementProperties);
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "materialMeasurement.ftl"));
+		});
+
+		post("/materialMeasurement", (request, response) -> {
+
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				List<MaterialPropPayLoad> myObjects = Arrays
+						.asList(mapper.readValue(request.body(), MaterialPropPayLoad[].class));
+
+				for (MaterialPropPayLoad pl : myObjects) {
+					System.out.println(pl.propertyDescription + " " + pl.propertyValue);
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println(e.getMessage());
+			}catch(Exception e ){
+				System.out.println(e.getMessage());
+			}
+			
+			try{
+			System.out.println("Body: " + request.body());
+			// System.out.println(responseData);
+			}
+			catch(Exception e){
+				System.out.println(e.getMessage());
+			}
+			
+
+			return "200 OK";
 		});
 
 		// Session logout

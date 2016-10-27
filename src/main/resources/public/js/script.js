@@ -1,95 +1,101 @@
 window.onload = function() {
 	var
-		buttons = document.getElementsByTagName('span'), result = document.querySelectorAll('.result')[0], 
-		clear = document.getElementById("clear");
-		view = document.getElementById("view");
+		result = document.querySelectorAll('.result')[0];
+		buttons = document.getElementsByTagName('span');
 		property = document.getElementById("view");
+		properties = document.getElementsByClassName("property"); 
+		document.getElementsByClassName("property")[0].className += " focus";
+		clear = document.getElementById("clear");
 		enter = document.getElementById("enter");
-		properties = document.getElementsByClassName("property");
-		materialTypeMeasurementProperties = new Array();
-		document.getElementById("1").className += " focus";	
-		
+		submit = document.getElementById("submit");
+		materialTypeMeasurementProperties = new Array();		
 
 	for (var i = 0; i < buttons.length; i += 1) {
 		buttons[i].addEventListener("click", addValue(i));
 	};
 
 	for (var i = 0; i < properties.length; i += 1) {
-		properties[i].addEventListener("click", setProperty(i));		
+		properties[i].addEventListener("click", setProperty(i));
+		materialTypeMeasurementProperties.push({'propertyDescription': properties[i].defaultValue, 'propertyValue': ''});
 	};	
 
 	clear.onclick = function() {
-		result.value = '';		
+		result.value = '';
+		for(var i = 0; i < materialTypeMeasurementProperties.length; i++){ materialTypeMeasurementProperties[i].propertyValue = ""; }
 	};
 	
-	enter.onclick = function() {		
-		if(materialTypeMeasurementProperties.length > 0){
-			for (var i = 0; i < materialTypeMeasurementProperties.length; i += 1){
-				if(materialTypeMeasurementProperties[i].description != document.getElementsByClassName("focus")[0].value){
-					materialTypeMeasurementProperties.push({'description': document.getElementsByClassName("focus")[0].value,  'measurement_properties_id': document.getElementById('result').value});
-					break;
-				} else {
-					if(document.getElementById('result').value != materialTypeMeasurementProperties[i].measurement_properties_id){
-						materialTypeMeasurementProperties.splice(i, 1);
-						materialTypeMeasurementProperties.push({'description': document.getElementsByClassName("focus")[0].value,  'measurement_properties_id': document.getElementById('result').value});						
-					} else {
-						document.getElementById('result').value = materialTypeMeasurementProperties[i].measurement_properties_id;
-					}
-				}				
-			} 
-			
-		} else if(materialTypeMeasurementProperties.length == 0) {
-			materialTypeMeasurementProperties.push({'description': document.getElementsByClassName("focus")[0].value,  'measurement_properties_id': document.getElementById('result').value});
-		}
+	enter.onclick = function() {
+		for(var i = 0; i < materialTypeMeasurementProperties.length; i++){
+			if(materialTypeMeasurementProperties[i].propertyDescription == document.getElementsByClassName("focus")[0].value){
+				materialTypeMeasurementProperties[i].propertyValue = document.getElementById('result').value;
+			}
+		};
 		
 		result.value = '';
+		$(".focus").removeClass("focus").next().addClass("focus");	
+		viewResult();	
+	};
+
+	viewResult = function(){
+		document.getElementById('totalResult').value = '';
+		for(i in materialTypeMeasurementProperties){
+			if(materialTypeMeasurementProperties[i].propertyValue != ""){
+				document.getElementById('totalResult').value += materialTypeMeasurementProperties[i].propertyValue;
+				if(i < materialTypeMeasurementProperties.length - 1){
+					document.getElementById('totalResult').value += ' x ';
+				}
+			}			
+		}
+		for (var i = 0; i < materialTypeMeasurementProperties.length; i += 1) {
+			if ($( ".properties_btn .text_btn" ).hasClass( "focus" ) && materialTypeMeasurementProperties[i].propertyDescription == document.getElementsByClassName("focus")[0].value) {					
+				document.getElementById('result').value = materialTypeMeasurementProperties[i].propertyValue;				
+			}
+		}
+	};
+	
+	function addValue(i) {
+		if($( ".properties_btn .text_btn" ).hasClass( "focus" )){
+			return function() {
+				document.getElementById('result').value += buttons[i].innerText;			
+			}	
+		}		
+	};	
+	
+	function setProperty(i) {
+		return function() {		
+			document.getElementById('result').classList.remove("view");
+			for (var i = 0; i < properties.length; i += 1) { properties[i].classList.remove("focus"); }
+			this.className += " focus";
+			result.value = '';
+			for (var i = 0; i < materialTypeMeasurementProperties.length; i += 1) {
+				if (materialTypeMeasurementProperties[i].propertyDescription == document.getElementsByClassName("focus")[0].value) {					
+					document.getElementById('result').value = materialTypeMeasurementProperties[i].propertyValue;				
+				}
+			}
+			viewResult();
+		}		
 	}
 	
-	view.onclick = function() {
-		result.value = '';
-		document.getElementById("result").className += " view";	
-		
-		for (var i = materialTypeMeasurementProperties.length; i > 0; i -= 1){
-			document.getElementById('result').value += ' x ' + materialTypeMeasurementProperties[i -1].measurement_properties_id;	  
-		 };
-	};
-
-	function addValue(i) {
-		return function() {
-			document.getElementById('result').value += buttons[i].innerText;			
-		};
-	};
-
-	function setProperty(i) {	
-		return function() {	
-			
-			document.getElementById('result').classList.remove("view");
-			for (var i = 0; i < properties.length; i += 1) {			
-				properties[i].classList.remove("focus");
-			}
-			this.className += " focus";	
-			
-			result.value = '';
-			for (var i = 0; i < materialTypeMeasurementProperties.length; i += 1){				
-			if(materialTypeMeasurementProperties[i].description == document.getElementsByClassName("focus")[0].value){		
-				document.getElementById('result').value = materialTypeMeasurementProperties[i].measurement_properties_id;
-			 } 
-			}	
-		};
-	};
+	submit.onclick = function() {
+		var valid = false;		
+		for (var i = 0; i < materialTypeMeasurementProperties.length; i += 1){
+			if(materialTypeMeasurementProperties[i].propertyValue != "") {			
+				valid = true;
+			} else valid = false;		  
+		 };	
+		if(properties.length != materialTypeMeasurementProperties.length) {
+			valid = false;	
+		};	
+		if(valid){
+			$.ajax({
+				type: "POST",
+				url: '/materialMeasurement',
+				dataType: "json",
+				data: JSON.stringify(materialTypeMeasurementProperties),
+				success: function(response){
+					}
+				
+				});
+		}
+	}
 };
-
-function Validate() {
-	var valid = false;
-	
-	for (var i = 0; i < materialTypeMeasurementProperties.length; i += 1){
-		if(materialTypeMeasurementProperties[i].measurement_properties_id != "") {
-			valid = true;
-		} else valid = false;		  
-	 };
-	
-	if(properties.length != materialTypeMeasurementProperties.length) {
-		valid = false;	
-	};
-	return valid;
-}

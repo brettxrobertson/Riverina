@@ -229,12 +229,22 @@ a:link, a:visited, a:hover, a:active {
 
 .result {
   width: 1015px;
-  height: 190px;
+  height: 100px;
   float: left;
   line-height: 40px;
   background-color: #a5a5a5;
   color: #fff;   
   font-size: 120px; 
+}
+
+.totalResult {
+  width: 1015px;
+  height: 80px;
+  float: left;
+  line-height: 30px;
+  background-color: #a5a5a5;
+  color: #fff;   
+  font-size: 80px; 
 }
 
 .clear, .nbr_btn, input {

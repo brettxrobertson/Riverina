@@ -3,7 +3,8 @@
 
 <link href="/css/main.css" rel="stylesheet"/>
 <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
-<script type="text/javascript" src="/js/script.js" />"></script>   
+<script type="text/javascript" src="/js/script.js" />"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>  
 
 <style>
 * {
@@ -24,18 +25,17 @@ html, body {
 
 <div class="header">	
 	<a href="" class="arrow-return"></a>
-	<h1 class="page-title">Select measurements</h1> 	
-	<a href="/initial.html" class="home-btn"></a>	
-										   
+	<h1 class="page-title">${userScreenDescription}</h1> 	
+	<a href="/${userScreenHomeLocation}" class="home-btn"></a>										   
 </div>
 
 <div class="content" id="content">
- 	<form name="enterForm" onsubmit="return Validate(this)" method="post" action="/materialMeasurement" enctype="multipart/form-data">
+ 	<form name="enterForm" enctype="multipart/form-data">
  	
 	<div id="enter_form">
 		
     <input type="text" id="result" class="result" onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46'>  
-        
+    <input type="text" id="totalResult" class="totalResult" disabled>    
     <div class="properties_btn">
 	<#list materialTypeMeasurementProperties as prop>
 	  	<input type="button" class="text_btn property" id=${prop.id} value="${prop.description}">	  	
@@ -61,12 +61,10 @@ html, body {
 	<span class="nbr_btn two_size_btn"> 0 </span>
     <span class="nbr_btn"> . </span> 
                  
-    <div class="properties_right"> 
-    
-    <input type="button" class="text_btn" id="enter" value="Enter">
-    <input type="button" class="text_btn" id="view" value="View">
+    <div class="properties_right">     
     <input type="reset" class="text_btn" id="clear" value="Clear">
-    <input type="submit" class="text_btn" value="Submit" value="Submit" />    
+    <input type="button" class="text_btn" id="enter" value="Enter">    
+    <input type="submit" class="text_btn" id="submit" value="Submit" />    
 
 	</div>
 
