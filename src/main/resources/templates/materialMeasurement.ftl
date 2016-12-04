@@ -30,7 +30,7 @@ html, body {
 </div>
 
 <div class="content" id="content">
- 	<form name="enterForm" enctype="multipart/form-data">
+ 	<form name="enterForm" id="enterForm" action="/materialMeasurement" enctype="text/plain" method="POST">
  	
 	<div id="enter_form">
 		
@@ -69,6 +69,8 @@ html, body {
 	</div>
 
   </div>
+  	<input type="hidden" name="postResult" id="postResult" value="">
+  
  	  </form> 
 </div>  
 </body>

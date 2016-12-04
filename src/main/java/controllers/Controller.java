@@ -134,6 +134,7 @@ public class Controller {
 			Map<String, Object> attributes = new HashMap<>();
 			request.session().attribute("jobId", request.queryParams("jobId"));
 			attributes.put("materialTypes", model.getAllParentMaterialTypes());
+
 			attributes.put("session", request.session());
 			attributes.put("userScreenDescription", "Select Materials");
 			attributes.put("userScreenHomeLocation", "initial.html");
@@ -161,16 +162,18 @@ public class Controller {
 				// If material type has sub types/children show them
 				if (!model.getMaterialTypeChildren(materialType.getId()).isEmpty()) {
 					attributes.put("materialTypes", model.getMaterialTypeChildren(materialType.getId()));
-					attributes.put("session", request.session());
+					// attributes.put("session", request.session());
 
 					return freeMarkerEngine.render(new ModelAndView(attributes, "material_types.ftl"));
 
 				} else {
 					attributes.put("materialTypes", materialType);
+					request.session().attribute("materialTypes", materialType.getId());
 					attributes.put("session", request.session());
-
-					response.redirect("/materialMeasurement/" + materialType.getId());
-					return null;
+					
+					attributes.put("materials", model.getMaterialsByTypeId(materialType.getId()));
+					return freeMarkerEngine.render(new ModelAndView(attributes, "materials.ftl"));
+					
 				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Index out of bounds: no materials found");
@@ -180,7 +183,8 @@ public class Controller {
 			}
 			return null;
 		});
-
+		
+		
 		// Add material measurements
 		get("/materialMeasurement/:id", (request, response) -> {
 
@@ -188,13 +192,15 @@ public class Controller {
 
 			try {
 				materialId = Integer.parseInt(request.params(":id"));
+				request.session().attribute("materialId", materialId);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 			// Attribute Map for session variables
 			Map<String, Object> attributes = new HashMap<>();
+
 			attributes.put("session", request.session());
-			attributes.put("userScreenDescription", "Select size and qty");
+			attributes.put("userScreenDescription", "Select measurements");
 			attributes.put("userScreenHomeLocation", "initial.html");
 
 			List<MeasurementProperty> materialTypeMeasurementProperties = model
@@ -206,34 +212,66 @@ public class Controller {
 		});
 
 		post("/materialMeasurement", (request, response) -> {
+			response.status(200);
+			
+			ObjectMapper mapper = new ObjectMapper();
+			
+			List<MaterialPropPayLoad> myPayLoads = null;
+			
+			Map<String, Object> attributes = new HashMap<>();
 
+			attributes.put("session", request.session());
+			attributes.put("userScreenDescription", "Select measurements");
+			attributes.put("userScreenHomeLocation", "initial.html");
+			
 			try {
-				ObjectMapper mapper = new ObjectMapper();
-				List<MaterialPropPayLoad> myObjects = Arrays
-						.asList(mapper.readValue(request.body(), MaterialPropPayLoad[].class));
-
-				for (MaterialPropPayLoad pl : myObjects) {
+				
+				String justJSON = request.body().substring(11);
+				
+				
+				
+				myPayLoads = Arrays
+						.asList(mapper.readValue(justJSON, MaterialPropPayLoad[].class));
+				
+				for (MaterialPropPayLoad pl : myPayLoads) {
 					System.out.println(pl.propertyDescription + " " + pl.propertyValue);
 				}
+				System.out.println(request.session().attributes());
 
+				
 			} catch (JsonParseException e) {
 				System.out.println(e.getMessage());
-			}catch(Exception e ){
+			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 			
 			try{
-			System.out.println("Body: " + request.body());
-			// System.out.println(responseData);
-			}
-			catch(Exception e){
+				//Add usage measurements to DB
+				int materialId = Integer.parseInt(request.session().attribute("materialId").toString());
+				int userId = Integer.parseInt(request.session().attribute("sessionId").toString());
+				
+				model.addMaterialUsage(myPayLoads, materialId, userId);
+			
+			}catch(Exception e){
 				System.out.println(e.getMessage());
 			}
 			
-
-			return "200 OK";
+			return freeMarkerEngine.render(new ModelAndView(attributes, "jobSummary.ftl"));
+			//return "hello";
 		});
 
+		// Session logout
+				get("/jobSummary", (request, response) -> {
+					
+					Map<String, Object> attributes = new HashMap<>();
+					attributes.put("session", request.session());
+					attributes.put("userScreenDescription", "Job Summary");
+					attributes.put("userScreenHomeLocation", "initial.html");
+					
+					return freeMarkerEngine.render(new ModelAndView(attributes, "jobSummary.ftl"));
+				});
+
+		
 		// Session logout
 		get("/logout", (request, response) -> {
 			request.session().invalidate();

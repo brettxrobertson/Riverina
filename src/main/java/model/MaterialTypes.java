@@ -14,7 +14,7 @@ public class MaterialTypes implements java.io.Serializable {
 	private String description;
 	private String uom;
 	private Integer parentTypesId;
-	private Integer measurementPropertiesId;
+	
 	/**
 	 * @return the uom
 	 */
@@ -27,20 +27,6 @@ public class MaterialTypes implements java.io.Serializable {
 	 */
 	public void setUom(String uom) {
 		this.uom = uom;
-	}
-
-	/**
-	 * @return the measurementPropertiesId
-	 */
-	public Integer getMeasurementPropertiesId() {
-		return measurementPropertiesId;
-	}
-
-	/**
-	 * @param measurementPropertiesId the measurementPropertiesId to set
-	 */
-	public void setMeasurementPropertiesId(Integer measurementPropertiesId) {
-		this.measurementPropertiesId = measurementPropertiesId;
 	}
 
 	private Set defaultOperationses = new HashSet(0);
