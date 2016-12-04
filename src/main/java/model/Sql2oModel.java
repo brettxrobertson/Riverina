@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 import org.sql2o.Sql2o;
+import org.sql2o.Sql2oException;
 import org.sql2o.data.Table;
 
 import controllers.CustomerController;
@@ -171,10 +172,16 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	public List<Map<String, Object>> getMaterialsByTypeId(Integer id) {
 
-		String sql = "select m.*,mp.id as measurement_properties_id, " + "mp.description as property_description,"
-				+ " mhmp.measurement from materials m," + " materials_has_measurement_properties mhmp,"
-				+ "measurement_properties mp" + " where m.id = mhmp.materials_id and "
-				+ "mhmp.measurement_properties_id = mp.id and" + " material_types_id = :id";
+		// String sql = "select m.*,mp.id as measurement_properties_id, " +
+		// "mp.description as property_description,"
+		// + " mhmp.measurement from materials m," + "
+		// materials_has_measurement_properties mhmp,"
+		// + "measurement_properties mp" + " where m.id = mhmp.materials_id and
+		// "
+		// + "mhmp.measurement_properties_id = mp.id and" + " material_types_id
+		// = :id";
+
+		String sql = "select * from materials where material_types_id = :id";
 
 		try (Connection con = sql2o.open()) {
 
@@ -208,21 +215,20 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	public List<MeasurementProperty> getMaterialMeasurementProperties(Integer id) {
 
-		String sql = "select mthmp.measurement_properties_id as id, mp.description from "
-				+ "material_types_has_measurement_properties mthmp, measurement_properties mp, material_types mt"
-				+ " where mt.id = :id and mthmp.material_types_id = mt.id and mp.id = mthmp.measurement_properties_id";
+		String sql = "select mhmp.measurement_properties_id as id, mp.description from measurement_properties mp, materials_has_measurement_properties mhmp "
+				+ "where mp.id = mhmp.measurement_properties_id and mhmp.materials_id = :id and mhmp.measurement is null";
 
 		try (Connection con = sql2o.open()) {
 
-//			Table table = con.createQuery(sql).addParameter("id", id).setAutoDeriveColumnNames(true)
-//					.executeAndFetchTable();
-//
-//			return tableToList(table);
-			
+			// Table table = con.createQuery(sql).addParameter("id",
+			// id).setAutoDeriveColumnNames(true)
+			// .executeAndFetchTable();
+			//
+			// return tableToList(table);
+
 			return con.createQuery(sql).addParameter("id", id).setAutoDeriveColumnNames(true)
 					.executeAndFetch(MeasurementProperty.class);
-			
-			
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -242,5 +248,76 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		}
 		return mapList;
+	}
+
+	// Return materialId of material with matching details
+	public Integer materialByProperties(List<MaterialPropPayLoad> payLoadList, int materialTypesId) throws Exception {
+
+		// Material properties string
+		String materialPropertiesSql = "";
+
+		for (MaterialPropPayLoad load : payLoadList) {
+
+			if (materialPropertiesSql != "") {
+				materialPropertiesSql += " and ";
+			}
+			materialPropertiesSql += " ( mhmp.material_properties_id = '" + load.propertyId
+					+ "' and mhmp.measurement = " + load.propertyValue;
+		}
+
+		String sql = "SELECT * FROM materials m, materials_has_measurement_properties mhmp,"
+				+ " material_types mt  where m.material_types_id = :materialTypesId" + " and " + materialPropertiesSql;
+
+		return null;
+
+	}
+
+	public Long addMaterialUsage(final List<MaterialPropPayLoad> payLoadList, final int materialsId, final int userId) {
+
+		String sql = "insert into materials_usage (materials_id, users_id) values(:materialsId, :usersId)";
+		Long insertedId = null;
+
+		try (Connection con = sql2o.open()) {
+
+			Long key = con.createQuery(sql, true)
+					.addParameter("materialsId", materialsId)
+					.addParameter("usersId", userId)
+					.executeUpdate().getKey(Long.class);
+			insertedId = key;
+		} catch (Sql2oException e) {
+			System.out.println("Failed to insert record");
+		}catch(Exception e ){
+			System.err.println(e.getLocalizedMessage() + e.getMessage());
+		}
+		if (insertedId != null) {
+			addMUmeasurements(payLoadList, insertedId);
+		}
+
+		return insertedId;
+	}
+
+	private boolean addMUmeasurements(List<MaterialPropPayLoad> payLoadList, Long insertedId) {
+
+		String sql = "insert into materials_usage_has_measurement_properties "
+				+ "(materials_usage_id, measurement_properties_id, measurement) "
+				+ "values(:materials_usage_id, :measurement_properties_id, :measurement)";
+
+		try (Connection con = sql2o.open()) {
+			
+			for(MaterialPropPayLoad load : payLoadList){
+
+				con.createQuery(sql)
+				.addParameter("materials_usage_id", insertedId)
+				.addParameter("measurement_properties_id", load.propertyId)
+				.addParameter("measurement", load.propertyValue)
+				.executeUpdate();
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+		return false;
+
 	}
 }
