@@ -7,7 +7,7 @@
 <body>
 
 <div class="header">	
-	<a href="" class="arrow-return"></a>
+	<a href="javascript:history.back()" class="arrow-return"></a>
 	<h1 class="page-title">${userScreenDescription}</h1>	
 	<a href="${userScreenHomeLocation}" class="home-btn"></a>										   
 </div>

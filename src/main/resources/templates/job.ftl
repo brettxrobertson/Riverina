@@ -8,9 +8,9 @@
 <body>
 
 <div class="header">	
-	<a href="" class="arrow-return"></a>
+	<a href="javascript:history.back()" class="arrow-return"></a>
 	<h1 class="page-title">Select a job from the list</h1>	
-	<a href="" class="home-btn"></a>										   
+	<a href="/" class="home-btn"></a>										   
 </div>
 
 <div class="content" id="content">

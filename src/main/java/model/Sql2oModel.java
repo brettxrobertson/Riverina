@@ -1,7 +1,9 @@
 package model;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -272,21 +274,20 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	}
 
-	public Long addMaterialUsage(final List<MaterialPropPayLoad> payLoadList, final int materialsId, final int userId) {
+	public Long addMaterialUsage(final List<MaterialPropPayLoad> payLoadList, final int materialsId, final int userId,
+			final int jobId) {
 
-		String sql = "insert into materials_usage (materials_id, users_id) values(:materialsId, :usersId)";
+		String sql = "insert into materials_usage (materials_id, users_id, job_id) values(:materialsId, :usersId,:jobId)";
 		Long insertedId = null;
 
 		try (Connection con = sql2o.open()) {
 
-			Long key = con.createQuery(sql, true)
-					.addParameter("materialsId", materialsId)
-					.addParameter("usersId", userId)
-					.executeUpdate().getKey(Long.class);
+			Long key = con.createQuery(sql, true).addParameter("materialsId", materialsId)
+					.addParameter("usersId", userId).addParameter("jobId", jobId).executeUpdate().getKey(Long.class);
 			insertedId = key;
 		} catch (Sql2oException e) {
 			System.out.println("Failed to insert record");
-		}catch(Exception e ){
+		} catch (Exception e) {
 			System.err.println(e.getLocalizedMessage() + e.getMessage());
 		}
 		if (insertedId != null) {
@@ -303,21 +304,70 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 				+ "values(:materials_usage_id, :measurement_properties_id, :measurement)";
 
 		try (Connection con = sql2o.open()) {
-			
-			for(MaterialPropPayLoad load : payLoadList){
 
-				con.createQuery(sql)
-				.addParameter("materials_usage_id", insertedId)
-				.addParameter("measurement_properties_id", load.propertyId)
-				.addParameter("measurement", load.propertyValue)
-				.executeUpdate();
+			for (MaterialPropPayLoad load : payLoadList) {
+
+				con.createQuery(sql).addParameter("materials_usage_id", insertedId)
+						.addParameter("measurement_properties_id", load.propertyId)
+						.addParameter("measurement", load.propertyValue).executeUpdate();
 			}
-			
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 
 		return false;
+
+	}
+
+	public List<Map<String, Object>> getAllMaterialUsage(String jobId) throws SQLException {
+		// TODO Auto-generated method stub
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> measurements = new ArrayList<Map<String, Object>>();
+
+		int jobid = Integer.parseInt(jobId);
+
+		String sql = "select mu.*, m.description as material_desc,concat(u.name, ' ', u.surname) as name "
+				+ " from materials_usage mu,  " + " users u, materials m where mu.job_id = " + jobid + " and "
+				+ " m.id = mu.materials_id" + " and u.id = mu.users_id";
+
+		try {
+			try (Connection con = sql2o.open()) {
+				Table table = con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetchTable();
+
+				list = tableToList(table);
+
+				Iterator<Map<String, Object>> it = list.iterator();
+				while (it.hasNext()) {
+					Map<String, Object> record = it.next();
+
+					measurements = getMeasurements(record.get("id").toString());
+					record.put("measurements",measurements);
+				}
+			}
+		} catch (Sql2oException e) {
+			SQLException originalException = (SQLException) e.getCause();
+			System.out.println(originalException);
+		}
+		return list;
+	}
+
+	private List<Map<String, Object>> getMeasurements(String usageId) {
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+		String sql = "select mu.id,mp.description,muhmp.measurement "
+				+ "from materials_usage mu, measurement_properties mp, materials_usage_has_measurement_properties muhmp"
+				+ " where mu.id = muhmp.materials_usage_id and "
+				+ "muhmp.measurement_properties_id = mp.id and mu.id = " + usageId;
+
+		try (Connection con = sql2o.open()) {
+			Table table = con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetchTable();
+
+			list = tableToList(table);
+		}
+		return list;
 
 	}
 }

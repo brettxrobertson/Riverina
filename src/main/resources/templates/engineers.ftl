@@ -14,8 +14,9 @@
 <div class="content" id="content">
   <div class="card-container">
   	 <#list engineers as engineer>
-	  	<a href="/jobs?sessionId=${engineer.id}" class="button">
+	  	
 	  	<div class="card">
+	  	<a href="/jobs?sessionId=${engineer.id}" class="button">
 	  		<div class="circle"></div>
   				<div class="card-text">
   					<span>${engineer.name} ${engineer.surname}</span>
