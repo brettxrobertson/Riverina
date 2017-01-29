@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import spark.ModelAndView;
+import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import model.MaterialPropPayLoad;
 import model.MaterialTypes;
@@ -37,7 +38,12 @@ public class Controller {
 	 * @param model
 	 */
 	public Controller(Sql2oModel model) {
-
+		
+		
+		Spark.exception(Exception.class, (exception, request, response) -> {
+		    exception.printStackTrace();
+		});
+		
 		// Import the Google JSON library
 		Gson gson = new Gson();
 
@@ -63,14 +69,22 @@ public class Controller {
 
 			response.status(200);
 			response.type("text/html");
-
+			
+			System.out.println("Im here");
+			
 			Map<String, Object> attributes = new HashMap<>();
+			try{
 			attributes.put("engineers", model.getAllEngineers());
 			attributes.put("userScreenDescription", "Select user");
 			attributes.put("userScreenHomeLocation", "/");
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "engineers.ftl"));
-
+			}catch(Exception e){
+				
+				System.out.println("Ho Hom no db connection");
+				return "Ho hum no DB connection " + e.getMessage();
+				
+			}
 		});
 
 		// gets all engineers JSON

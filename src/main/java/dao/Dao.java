@@ -11,7 +11,7 @@ public class Dao {
 	static{
 		
 		//sql2o = new Sql2o("jdbc:mysql://162.243.40.230:3306/rmiDB?autoReconnect=true&useSSL=false", "root","riverina");
-        sql2o = new Sql2o("jdbc:mysql://localhost:3306/rimDB?useSSL=false", "root", "password");
+        sql2o = new Sql2o("jdbc:mysql://172.17.0.2:3306/rimDB?useSSL=false", "root", "password");
 		
     }
 }

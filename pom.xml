@@ -6,11 +6,19 @@
 	<artifactId>rim</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>riverina-rmi</name>
-<properties>
-   <maven.compiler.source>1.8</maven.compiler.source>
-   <maven.compiler.target>1.8</maven.compiler.target>
-</properties>
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+       
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+		</dependency>
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
@@ -63,4 +71,55 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	<build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <finalName>riverina-rmi</finalName>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>Main</mainClass>
+              <classpathPrefix>dependency-jars/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <finalName>riverina-rmi</finalName>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                <manifest>
+                  <mainClass>Main</mainClass>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
