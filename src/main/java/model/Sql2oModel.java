@@ -370,4 +370,25 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		return list;
 
 	}
+	
+	public List<Map<String, Object>> getJobHeader(String id){
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		
+		String sql = "select j.job_name,j.notes,j.date, c.name as customer_name, "
+				+ "concat(u.name,' ', u.surname) as user_name,"
+				+ " js.description as job_status from jobs j, "
+				+ "customers c, users u, job_status js "
+				+ "where j.customer_id = c.id and "
+				+ "u.id = j.users_id and js.id = j.job_status_id "
+				+ "and j.id = " + id;
+		
+		try (Connection con = sql2o.open()) {
+			Table table =  con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetchTable();
+			
+			list = tableToList(table);
+		}
+		return list;
+	}
+	
 }

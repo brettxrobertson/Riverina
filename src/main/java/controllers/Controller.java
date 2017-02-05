@@ -273,7 +273,9 @@ public class Controller {
 					
 					System.out.println(record);
 				}
-					
+				
+				attributes.put("jobs", model.getJobHeader(request.session().attribute("jobId")));
+				
 				
 				attributes.put("rows", model.getAllMaterialUsage(request.session().attribute("jobId")));
 				

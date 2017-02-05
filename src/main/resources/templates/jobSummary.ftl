@@ -35,7 +35,25 @@ html, body {
 	<h1 class="page-title">${userScreenDescription}</h1> 	
 	<a href="/" class="home-btn"></a>										   
 </div>
-	
+
+<div>
+<table class="table">
+  <thead>
+    <tr>
+    <th>Customer</th><th>Job</th><th>Date</th><th>Status</th><th>User</th>
+    </tr>
+     <#list jobs as job>
+    <tr>
+    <td>${job.customer_name}</td>
+    <td>${job.job_name}</td>
+    <td>${job.date}</td>
+    <td>${job.job_status}</td>
+    <td>${job.user_name}</td>
+    </tr>
+    </#list>
+  </thead>
+ </table>
+</div>	
 
 <div>
 <table class="table">
