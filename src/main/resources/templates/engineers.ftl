@@ -29,11 +29,11 @@
 </div>
 
 <div>
-	 <a href="#"><div class="footer footer-left">
+	 <a href="/factoryLogin?page=${backPage}"><div class="footer footer-left">
         <button class="btn btn-left">
   	</div></a>
 	 
-	 <a href="#"><div class="footer footer-right">
+	 <a href="/factoryLogin?page=${fwdPage}"><div class="footer footer-right">
         <button class="btn btn-right">
   	</div></a>
 </div>

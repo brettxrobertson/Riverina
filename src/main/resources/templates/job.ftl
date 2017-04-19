@@ -42,11 +42,11 @@
 			<div class="latters two-letter"> <a href="#" class="letter-text two-letter-text"> W - Z </a> </div>			
 		</div>
 	</div> 
-	 <a href="#"><div class="footer footer-left">
+	 <a href="/jobs?page=${backPage}"><div class="footer footer-left">
         <button class="btn btn-left">
   	</div></a>
 	 
-	 <a href="#"><div class="footer footer-right">
+	 <a href="/jobs?page=${fwdPage}"><div class="footer footer-right">
         <button class="btn btn-right">
   	</div></a>
 </div>

@@ -1,49 +1,40 @@
 package controllers;
 
-import static spark.Spark.*;
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.staticFileLocation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.sql2o.logging.SysOutLogger;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import lombok.Data;
 import com.google.gson.Gson;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
-import spark.ModelAndView;
-import spark.Spark;
-import spark.template.freemarker.FreeMarkerEngine;
 import model.MaterialPropPayLoad;
 import model.MaterialTypes;
 import model.MeasurementProperty;
 import model.Sql2oModel;
+import spark.ModelAndView;
+import spark.Spark;
+import spark.template.freemarker.FreeMarkerEngine;
 
 public class Controller {
 
 	/**
 	 * @param model
 	 */
-	/**
-	 * @param model
-	 */
 	public Controller(Sql2oModel model) {
-		
-		
+
 		Spark.exception(Exception.class, (exception, request, response) -> {
-		    exception.printStackTrace();
+			exception.printStackTrace();
 		});
-		
+
 		// Import the Google JSON library
 		Gson gson = new Gson();
 
@@ -67,23 +58,33 @@ public class Controller {
 		// gets all engineers HTML
 		get("/factoryLogin", (request, response) -> {
 
+			
+
 			response.status(200);
 			response.type("text/html");
 			
-			System.out.println("Im here");
-			
-			Map<String, Object> attributes = new HashMap<>();
-			try{
-			attributes.put("engineers", model.getAllEngineers());
-			attributes.put("userScreenDescription", "Select user");
-			attributes.put("userScreenHomeLocation", "/");
+			Integer page;
+			if (request.queryParams("page") == null) {
+				page = 0;
+			} else {
+				page = Integer.parseInt(request.queryParams("page"));
+			}
 
-			return freeMarkerEngine.render(new ModelAndView(attributes, "engineers.ftl"));
-			}catch(Exception e){
-				
+			Map<String, Object> attributes = new HashMap<>();
+			try {
+
+				attributes.put("backPage", (page > 0) ? page - 1 : 0);
+				attributes.put("fwdPage", page + 1);
+				attributes.put("engineers", model.getAllEngineers(page));
+				attributes.put("userScreenDescription", "Select user");
+				attributes.put("userScreenHomeLocation", "/");
+
+				return freeMarkerEngine.render(new ModelAndView(attributes, "engineers.ftl"));
+			} catch (Exception e) {
+
 				System.out.println("Ho Hom no db connection");
 				return "Ho hum no DB connection " + e.getMessage();
-				
+
 			}
 		});
 
@@ -100,6 +101,13 @@ public class Controller {
 			response.status(200);
 			response.type("text/html");
 
+			Integer page;
+			if (request.queryParams("page") == null) {
+				page = 0;
+			} else {
+				page = Integer.parseInt(request.queryParams("page"));
+			}
+
 			if (request.queryParams("sessionId") == null && request.session().attribute("sessionId") == null) {
 				response.redirect("/factoryLogin");
 			} else if (request.session().attribute("sessionId") == null) {
@@ -108,13 +116,16 @@ public class Controller {
 
 			Map<String, Object> attributes = new HashMap<>();
 
-			attributes.put("jobs", model.getAllJobs());
+			attributes.put("backPage", (page > 0) ? page - 1 : 0);
+			attributes.put("fwdPage", page + 1);
+
+			attributes.put("jobs", model.getAllJobs(page));
 			attributes.put("session", request.session());
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "job.ftl"));
 		});
 		// gets all Jobs JSON
-		get("/service/jobs", (request, response) -> model.getAllJobs(), gson::toJson);
+		get("/service/jobs", (request, response) -> model.getAllJobs(null), gson::toJson);
 		// TODO add post job
 
 		// USERS
@@ -125,7 +136,7 @@ public class Controller {
 		get("/engineers", (request, response) -> {
 			response.status(200);
 			response.type("text/html");
-
+			
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("users", model.getUsers());
 			attributes.put("session", request.session());
@@ -146,11 +157,21 @@ public class Controller {
 		get("/materialTypes", (request, response) -> {
 			response.status(200);
 			response.type("text/html");
-
+			
+			Integer page;
+			if (request.queryParams("page") == null) {
+				page = 0;
+			} else {
+				page = Integer.parseInt(request.queryParams("page"));
+			}
+			
 			Map<String, Object> attributes = new HashMap<>();
 			request.session().attribute("jobId", request.queryParams("jobId"));
-			attributes.put("materialTypes", model.getAllParentMaterialTypes());
-
+			attributes.put("materialTypes", model.getAllParentMaterialTypes(page));
+			
+			attributes.put("backPage", (page > 0) ? page - 1 : 0);
+			attributes.put("fwdPage", page + 1);
+			
 			attributes.put("session", request.session());
 			attributes.put("userScreenDescription", "Select Materials");
 			attributes.put("userScreenHomeLocation", "/");
@@ -165,7 +186,20 @@ public class Controller {
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("userScreenDescription", "Select Materials");
 			attributes.put("userScreenHomeLocation", "/");
-
+			
+			Integer page;
+			if (request.queryParams("page") == null) {
+				page = 0;
+			} else {
+				page = Integer.parseInt(request.queryParams("page"));
+			}
+			
+			Integer materialId = Integer.parseInt(request.params(":id"));
+			
+			
+			attributes.put("materialId", materialId);
+			attributes.put("backPage", (page > 0) ? page - 1 : 0);
+			attributes.put("fwdPage", page + 1);
 			MaterialTypes materialType;
 
 			/*
@@ -176,8 +210,8 @@ public class Controller {
 				materialType = model.getMaterialTypesById(Integer.parseInt(request.params(":id"))).get(0);
 
 				// If material type has sub types/children show them
-				if (!model.getMaterialTypeChildren(materialType.getId()).isEmpty()) {
-					attributes.put("materialTypes", model.getMaterialTypeChildren(materialType.getId()));
+				if (!model.getMaterialTypeChildren(materialType.getId(),0).isEmpty()) {
+					attributes.put("materialTypes", model.getMaterialTypeChildren(materialType.getId(),page));
 					// attributes.put("session", request.session());
 
 					return freeMarkerEngine.render(new ModelAndView(attributes, "material_types.ftl"));
@@ -187,7 +221,7 @@ public class Controller {
 					request.session().attribute("materialTypes", materialType.getId());
 					attributes.put("session", request.session());
 
-					attributes.put("materials", model.getMaterialsByTypeId(materialType.getId()));
+					attributes.put("materials", model.getMaterialsByTypeId(materialType.getId(), page));
 					return freeMarkerEngine.render(new ModelAndView(attributes, "materials.ftl"));
 
 				}
@@ -263,23 +297,22 @@ public class Controller {
 				int jobId = Integer.parseInt(request.session().attribute("jobId").toString());
 
 				model.addMaterialUsage(myPayLoads, materialId, userId, jobId);
-				
-				List<Map<String, Object>> materialsList = model.getAllMaterialUsage(request.session().attribute("jobId"));
-				
+
+				List<Map<String, Object>> materialsList = model
+						.getAllMaterialUsage(request.session().attribute("jobId"));
+
 				Iterator<Map<String, Object>> it = materialsList.iterator();
-				
-				while(it.hasNext()){
+
+				while (it.hasNext()) {
 					Map<String, Object> record = it.next();
-					
+
 					System.out.println(record);
 				}
-				
+
 				attributes.put("jobs", model.getJobHeader(request.session().attribute("jobId")));
-				
-				
+
 				attributes.put("rows", model.getAllMaterialUsage(request.session().attribute("jobId")));
-				
-				
+
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
@@ -289,20 +322,32 @@ public class Controller {
 		});
 
 		// Session logout
-//		get("/jobSummary", (request, response) -> {
-//
-//			Map<String, Object> attributes = new HashMap<>();
-//			attributes.put("session", request.session());
-//			attributes.put("userScreenDescription", "Job Summary");
-//			attributes.put("userScreenHomeLocation", "initial.html");
-//
-//			return freeMarkerEngine.render(new ModelAndView(attributes, "jobSummary.ftl"));
-//		});
+		// get("/jobSummary", (request, response) -> {
+		//
+		// Map<String, Object> attributes = new HashMap<>();
+		// attributes.put("session", request.session());
+		// attributes.put("userScreenDescription", "Job Summary");
+		// attributes.put("userScreenHomeLocation", "initial.html");
+		//
+		// return freeMarkerEngine.render(new ModelAndView(attributes,
+		// "jobSummary.ftl"));
+		// });
 
 		// Session logout
 		get("/logout", (request, response) -> {
 			request.session().invalidate();
 			response.redirect("/");
+			return null;
+		});
+
+		// Office data input interface
+		get("/service/job", (request, response) -> {
+			response.status(200);
+			return freeMarkerEngine.render(new ModelAndView(null, "jobInput.ftl"));
+		});
+
+		post("service/job", (request, response) -> {
+
 			return null;
 		});
 

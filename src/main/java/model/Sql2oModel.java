@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sql2o.Connection;
-import org.sql2o.Query;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
 import org.sql2o.data.Table;
@@ -21,6 +20,8 @@ import spark.Request;
 public class Sql2oModel implements CustomerController, EngineerController, UserController {
 
 	private Sql2o sql2o;
+	
+	private Integer pageLimit = 8;
 
 	public Sql2oModel(Sql2o sql2o) {
 		this.sql2o = sql2o;
@@ -52,9 +53,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	}
 
 	@Override
-	public List<Engineer> getAllEngineers() {
+	public List<Engineer> getAllEngineers(Integer page) {
 
-		String sql = "select users.* from users left join user_types on users.user_types_id = user_types.id where user_types.description = 'Engineer'";
+		String sql = "select users.* from users left join user_types on users.user_types_id = user_types.id where user_types.description = 'Engineer' limit " + pageLimit  + " offset " + pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -114,9 +115,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	/**
 	 * @return
 	 */
-	public List<Job> getAllJobs() {
+	public List<Job> getAllJobs(Integer page) {
 
-		String sql = "SELECT * from jobs";
+		String sql = "SELECT * from jobs limit " + pageLimit  + " offset " + pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -137,15 +138,15 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	}
 
-	public List<MaterialTypes> getAllParentMaterialTypes() {
+	public List<MaterialTypes> getAllParentMaterialTypes(Integer page) {
 
-		String sql = "select * from material_types where parent_types_id is null";
-
+		String sql = "select * from material_types where parent_types_id is null limit " + pageLimit  + " offset " + pageLimit * page;
+		System.out.println(sql);
 		try (Connection con = sql2o.open()) {
 
 			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
 					.executeAndFetch(MaterialTypes.class);
-		}
+		} 
 
 	}
 
@@ -159,8 +160,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.executeAndFetch(MaterialTypes.class);
 		}
 
-	}
-
+	}	
 	public List<Materials> getMaterialsById(String id) {
 
 		String sql = "select * from materials where id = :id";
@@ -172,7 +172,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		}
 	}
 
-	public List<Map<String, Object>> getMaterialsByTypeId(Integer id) {
+	public List<Map<String, Object>> getMaterialsByTypeId(Integer id, Integer page) {
 
 		// String sql = "select m.*,mp.id as measurement_properties_id, " +
 		// "mp.description as property_description,"
@@ -183,7 +183,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		// + "mhmp.measurement_properties_id = mp.id and" + " material_types_id
 		// = :id";
 
-		String sql = "select * from materials where material_types_id = :id";
+		String sql = "select * from materials where material_types_id = :id  limit " + pageLimit  + " offset " + pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -200,10 +200,10 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	}
 
-	public List<MaterialTypes> getMaterialTypeChildren(Integer id) {
+	public List<MaterialTypes> getMaterialTypeChildren(Integer id, Integer page) {
 
 		String sql = "select id, description,UOM, parent_types_id "
-				+ "parentTypesId from material_types where parent_types_id = :id";
+				+ "parentTypesId from material_types where parent_types_id = :id limit " + pageLimit  + " offset " + pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -389,6 +389,12 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 			list = tableToList(table);
 		}
 		return list;
+	}
+
+	@Override
+	public List<Engineer> getAllEngineers() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

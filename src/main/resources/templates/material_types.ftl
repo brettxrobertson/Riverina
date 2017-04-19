@@ -27,12 +27,12 @@
 </div>
 
 <div> 
-	 <a href="#"><div class="footer footer-left">
-        <button class="btn btn-left-grey">
+	 <a href="/materialTypes?page=${backPage}"><div class="footer footer-left">
+        <button class="btn btn-left">
   	</div></a>
 	 
-	 <a href="#"><div class="footer footer-right">
-        <button class="btn btn-right-grey">
+	 <a href="/materialTypes?page=${fwdPage}"><div class="footer footer-right">
+        <button class="btn btn-right">
   	</div></a>
 </div>
   

@@ -7,6 +7,10 @@ import java.util.Set;
  */
 public class JobStatus implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private String description;
 	private Set componentses = new HashSet(0);

@@ -2,7 +2,6 @@ package model;
 // Generated Jun 17, 2016 11:36:27 AM by Hibernate Tools 5.1.0.Alpha1
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -10,6 +9,10 @@ import java.util.Set;
  */
 public class MaterialTypes implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private String description;
 	private String uom;

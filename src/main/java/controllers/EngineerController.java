@@ -10,4 +10,6 @@ public interface EngineerController {
 
 	List<Engineer> getAllEngineers();
 
+	List<Engineer> getAllEngineers(Integer page);
+
 }
