@@ -369,6 +369,7 @@ public class Controller {
 			 
 			 pairs.add(new BasicNameValuePair("users_id",request.session().attribute("sessionId")));
 			 
+			 //Convert pairs to Map
 			 Map<String, String> params = toMap(pairs);
 			 
 			 model.addJob(params);
