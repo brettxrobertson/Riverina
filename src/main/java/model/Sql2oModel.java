@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
@@ -20,7 +24,7 @@ import spark.Request;
 public class Sql2oModel implements CustomerController, EngineerController, UserController {
 
 	private Sql2o sql2o;
-	
+
 	private Integer pageLimit = 8;
 
 	public Sql2oModel(Sql2o sql2o) {
@@ -55,7 +59,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	@Override
 	public List<Engineer> getAllEngineers(Integer page) {
 
-		String sql = "select users.* from users left join user_types on users.user_types_id = user_types.id where user_types.description = 'Engineer' limit " + pageLimit  + " offset " + pageLimit * page;
+		String sql = "select users.* from users left join user_types on users.user_types_id = user_types.id where user_types.description = 'Engineer' limit "
+				+ pageLimit + " offset " + pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -97,8 +102,12 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	@Override
 	public List<Customer> getAllCustomers() {
-		// TODO Auto-generated method stub
-		return null;
+		String sql = "SELECT * from customers";
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetch(Customer.class);
+		}
 	}
 
 	public List<Customer> getCustomerById(int customerId) {
@@ -117,12 +126,32 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	 */
 	public List<Job> getAllJobs(Integer page) {
 
-		String sql = "SELECT * from jobs limit " + pageLimit  + " offset " + pageLimit * page;
+		String sql = "SELECT * from jobs limit " + pageLimit + " offset " + pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
 			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
 					.executeAndFetch(Job.class);
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public void addJob(Map<String, String> pairs) {
+
+		String sql = "insert into jobs (date, job_name, customer_id, notes, users_id, job_status_id) "
+				+ "values(:date, :job_name, :customer_id, :notes, :users_id, :job_status_id)";
+
+		try (Connection con = sql2o.open()) {
+
+			int createId = con.createQuery(sql).addParameter("date", pairs.get("date"))
+					.addParameter("job_name", pairs.get("jobDescription"))
+					.addParameter("customer_id", pairs.get("customer_id")).addParameter("notes", pairs.get("notes"))
+					.addParameter("users_id", pairs.get("users_id")).addParameter("job_status_id", 4).executeUpdate()
+					.getKey(Integer.class);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -140,13 +169,14 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	public List<MaterialTypes> getAllParentMaterialTypes(Integer page) {
 
-		String sql = "select * from material_types where parent_types_id is null limit " + pageLimit  + " offset " + pageLimit * page;
+		String sql = "select * from material_types where parent_types_id is null limit " + pageLimit + " offset "
+				+ pageLimit * page;
 		System.out.println(sql);
 		try (Connection con = sql2o.open()) {
 
 			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
 					.executeAndFetch(MaterialTypes.class);
-		} 
+		}
 
 	}
 
@@ -160,7 +190,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.executeAndFetch(MaterialTypes.class);
 		}
 
-	}	
+	}
+
 	public List<Materials> getMaterialsById(String id) {
 
 		String sql = "select * from materials where id = :id";
@@ -183,7 +214,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		// + "mhmp.measurement_properties_id = mp.id and" + " material_types_id
 		// = :id";
 
-		String sql = "select * from materials where material_types_id = :id  limit " + pageLimit  + " offset " + pageLimit * page;
+		String sql = "select * from materials where material_types_id = :id limit " + pageLimit + " offset "
+				+ pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -203,7 +235,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public List<MaterialTypes> getMaterialTypeChildren(Integer id, Integer page) {
 
 		String sql = "select id, description,UOM, parent_types_id "
-				+ "parentTypesId from material_types where parent_types_id = :id limit " + pageLimit  + " offset " + pageLimit * page;
+				+ "parentTypesId from material_types where parent_types_id = :id limit " + pageLimit + " offset "
+				+ pageLimit * page;
 
 		try (Connection con = sql2o.open()) {
 
@@ -342,8 +375,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 				while (it.hasNext()) {
 					Map<String, Object> record = it.next();
 
-					measurements = getMeasurements(record.get("id").toString());
-					record.put("measurements",measurements);
+					measurements = getMUMeasurements(record.get("id").toString());
+					record.put("measurements", measurements);
 				}
 			}
 		} catch (Sql2oException e) {
@@ -353,7 +386,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		return list;
 	}
 
-	private List<Map<String, Object>> getMeasurements(String usageId) {
+	public List<Map<String, Object>> getMUMeasurements(String usageId) {
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -370,22 +403,31 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		return list;
 
 	}
-	
-	public List<Map<String, Object>> getJobHeader(String id){
-		
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		
-		String sql = "select j.job_name,j.notes,j.date, c.name as customer_name, "
-				+ "concat(u.name,' ', u.surname) as user_name,"
-				+ " js.description as job_status from jobs j, "
-				+ "customers c, users u, job_status js "
-				+ "where j.customer_id = c.id and "
-				+ "u.id = j.users_id and js.id = j.job_status_id "
-				+ "and j.id = " + id;
-		
+
+	public List<MeasurementProperty> getAllMeasurementProperties() {
+
+		String sql = "select * from measurement_properties";
+
 		try (Connection con = sql2o.open()) {
-			Table table =  con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetchTable();
-			
+
+			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
+					.executeAndFetch(MeasurementProperty.class);
+		}
+
+	}
+
+	public List<Map<String, Object>> getJobHeader(String id) {
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+		String sql = "select j.job_name,j.notes,j.date, c.name as customer_name, "
+				+ "concat(u.name,' ', u.surname) as user_name," + " js.description as job_status from jobs j, "
+				+ "customers c, users u, job_status js " + "where j.customer_id = c.id and "
+				+ "u.id = j.users_id and js.id = j.job_status_id " + "and j.id = " + id;
+
+		try (Connection con = sql2o.open()) {
+			Table table = con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetchTable();
+
 			list = tableToList(table);
 		}
 		return list;
@@ -396,5 +438,58 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	public void addMaterial(Map<String, String> params) {
+		String sql = "insert into materials (description,cost_price,qty_on_hand,material_types_id,markup_percent) "
+				+ "values(:description,:cost_price,:qty_on_hand,:material_types_id,:markup_percent)";
+		
+		String sql_mhmp = "insert into materials_has_measurement_properties (materials_id, measurement_properties_id, measurement)"
+				+ " values(:materials_id, :measurement_properties_id, :measurement)";
+		
+		
+		TreeMap<String, Object> treeMap = new TreeMap<String, Object>();
+		treeMap.putAll(params);
+		Map<String, Object> mprops = new TreeMap<String, Object>();
+
+		mprops.putAll(getByPrefix(treeMap, "mprop"));
+		Iterator<Entry<String, Object>> it = mprops.entrySet().iterator();
+
+		try (Connection con = sql2o.open()) {
+
+			int materialId = con.createQuery(sql).addParameter("description", params.get("description"))
+					.addParameter("cost_price", params.get("costPrice"))
+					.addParameter("qty_on_hand", params.get("qtyOnHand"))
+					.addParameter("material_types_id", params.get("materialTypeID"))
+					.addParameter("markup_percent", params.get("markUp")).executeUpdate().getKey(Integer.class);
+
+			while (it.hasNext()) {
+				
+				Map.Entry<String,Object> pair = (Entry<String, Object>)it.next();
+				
+				String id = pair.getKey().toString().substring(6);
+				String val = pair.getValue().toString();
+				
+				if(val.equals("")){
+					val = null;
+				}
+				
+				try{
+				int mhmpId = con.createQuery(sql_mhmp).addParameter("materials_id",  materialId)
+						.addParameter("measurement_properties_id", id)
+						.addParameter("measurement", val).executeUpdate().getKey(Integer.class);
+				}catch(Exception e){
+					//swallow the exception here as null value param throws exception
+				}
+			}
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+	}
+
+	private static SortedMap<String, Object> getByPrefix(NavigableMap<String, Object> myMap, String prefix) {
+		return myMap.subMap(prefix, prefix + Character.MAX_VALUE);
+	}
+
 }

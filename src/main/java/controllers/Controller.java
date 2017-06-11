@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
+import model.Customer;
 import model.MaterialPropPayLoad;
 import model.MaterialTypes;
 import model.MeasurementProperty;
@@ -23,6 +24,11 @@ import model.Sql2oModel;
 import spark.ModelAndView;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.nio.charset.Charset;
 
 public class Controller {
 
@@ -126,7 +132,7 @@ public class Controller {
 		});
 		// gets all Jobs JSON
 		get("/service/jobs", (request, response) -> model.getAllJobs(null), gson::toJson);
-		// TODO add post job
+		
 
 		// USERS
 		// creates user
@@ -341,16 +347,78 @@ public class Controller {
 		});
 
 		// Office data input interface
-		get("/service/job", (request, response) -> {
+		get("/api/v1/jobEntry", (request, response) -> {
 			response.status(200);
-			return freeMarkerEngine.render(new ModelAndView(null, "jobInput.ftl"));
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("session", request.session());
+			List<Customer> customers = model.getAllCustomers();
+			
+			attributes.put("customers", customers);
+			
+			return freeMarkerEngine.render(new ModelAndView(attributes, "jobEntry.ftl"));
 		});
 
-		post("service/job", (request, response) -> {
-
+		post("/api/v1/jobEntry", (request, response) -> {
+			
+			if(request.session().attribute("sessionId") == null){
+				throw new Exception("Not logged in");
+			}
+			
+			 List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
+			 
+			 pairs.add(new BasicNameValuePair("users_id",request.session().attribute("sessionId")));
+			 
+			 Map<String, String> params = toMap(pairs);
+			 
+			 model.addJob(params);
+			 
 			return null;
 		});
-
+		
+		
+		// Office data input interface
+		get("/api/v1/materialsEntry", (request, response) -> {
+			response.status(200);
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("session", request.session());
+			
+			//Add list of materialTypes to attributes
+			List<MaterialTypes> materialTypes = model.getAllMaterialTypes();
+			attributes.put("materialTypes", materialTypes);
+			
+			//Add list of materialTypes to attributes
+			List<MeasurementProperty> measurementProperties = model.getAllMeasurementProperties();
+			attributes.put("measurementProperties", measurementProperties);
+			
+			
+			return freeMarkerEngine.render(new ModelAndView(attributes, "materialsEntry.ftl"));
+		});	
+		
+		
+		post("/api/v1/materialsEntry", (request, response) -> {
+			
+			 List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
+			 
+			 Map<String, String> params = toMap(pairs);
+			 
+			 model.addMaterial(params);
+			 
+			return null;
+		});
+	
+		
 	}
+	
+	
 
+	private static Map<String, String> toMap(List<NameValuePair> pairs){
+        Map<String, String> map = new HashMap<>();
+        for(int i=0; i<pairs.size(); i++){
+            NameValuePair pair = pairs.get(i);
+            map.put(pair.getName(), pair.getValue());
+        }
+        return map;
+    }
 }
