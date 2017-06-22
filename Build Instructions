@@ -1,0 +1,10 @@
+mvn clean
+mvn install
+docker build -f Dockerfile -t riverina .
+docker tag fecb6a9c1bce brettxrobertson/riverina
+docker push brettxrobertson/riverina:latest
+
+On Remote.
+docker login
+docker pull brettxrobertson/riverina:latest
+docker run --detatch --name riverina-app --link riverina-mysql -p 4567:4567 -t brettxrobertson/riverina
