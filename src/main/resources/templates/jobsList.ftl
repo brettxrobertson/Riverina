@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+    <title>Job List</title>
 
     <!-- Bootstrap -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -26,18 +26,26 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/js/bootstrap.min.js"></script>
     
-
- 
-    <div>Session ID ${session.attribute("sessionId")}</div>
+    
+  <table class="table table-striped">
+  <thead class="thead-inverse">
+    <tr>
+      
+      <th>Date</th>
+      <th>Job Description</th>
+      
+    </tr>
+  </thead>
+  <tbody>
   
-<#list jobs as job>
-   <a href="/materialTypes" class="button">
-   <span>${job.jobName}</span>
-   
-</#list>  
-
-
-<a href="/logout" class="button">
-<span>LOGOUT</span>
+  <#list jobs as job>
+    <tr>
+      <td>${job.date}</td>
+      <td><a href="/api/v1/jobSummary/${job.id}">${job.jobName}</a></td>
+      
+    </tr>
+   </#list>  
+   </tbody>
+</table>
 </body>
 </html>

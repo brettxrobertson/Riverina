@@ -75,7 +75,7 @@ html, body {
    			<td>${row.material_desc}</td>
    			<td>
    			<#list row.measurements as measurement>
-   			${measurement.description} = ${measurement.measurement}<br/>
+   				${measurement.description} = ${measurement.measurement}<br/>
    			</#list>
    			</td>
    			<td></td>

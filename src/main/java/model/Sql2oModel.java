@@ -126,7 +126,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	 */
 	public List<Job> getAllJobs(Integer page) {
 
-		String sql = "SELECT * from jobs limit " + pageLimit + " offset " + pageLimit * page;
+		String paging = "limit " + pageLimit + " offset " + pageLimit * page;
+		
+		String sql = "SELECT * from jobs " + paging;
 
 		try (Connection con = sql2o.open()) {
 
@@ -135,6 +137,22 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		}
 	}
 
+	/**
+	 * @return
+	 */
+	public List<Job> getAllJobsByStatus(JobStatus status) {
+
+		
+		String sql = "SELECT j.* from jobs j, job_status js where j.job_status_id = js.id and js.description = '" + status.getDescription() + "'";
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
+					.executeAndFetch(Job.class);
+		}
+	}
+
+	
 	/**
 	 * @return
 	 */
@@ -310,13 +328,18 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public Long addMaterialUsage(final List<MaterialPropPayLoad> payLoadList, final int materialsId, final int userId,
 			final int jobId) {
 
-		String sql = "insert into materials_usage (materials_id, users_id, job_id) values(:materialsId, :usersId,:jobId)";
+		String sql = "insert into materials_usage (materials_id, users_id, job_id,cost_price,markup_percent) "
+				+ "values(:materialsId, :usersId,:jobId,(select cost_price from materials where id = :materialsId),(select markup_percent from materials where id = :materialsId))";
 		Long insertedId = null;
 
 		try (Connection con = sql2o.open()) {
 
 			Long key = con.createQuery(sql, true).addParameter("materialsId", materialsId)
-					.addParameter("usersId", userId).addParameter("jobId", jobId).executeUpdate().getKey(Long.class);
+					.addParameter("usersId", userId)
+					.addParameter("jobId", jobId)
+					.addParameter("materialsId", materialsId)
+					.addParameter("materialsId", materialsId)
+					.executeUpdate().getKey(Long.class);
 			insertedId = key;
 		} catch (Sql2oException e) {
 			System.out.println("Failed to insert record");
@@ -361,7 +384,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		int jobid = Integer.parseInt(jobId);
 
-		String sql = "select mu.*, m.description as material_desc,concat(u.name, ' ', u.surname) as name "
+		String sql = "select mu.*,m.cost_price,m.markup_percent, m.description as material_desc,"
+				+ "concat(u.name, ' ', u.surname) as name "
 				+ " from materials_usage mu,  " + " users u, materials m where mu.job_id = " + jobid + " and "
 				+ " m.id = mu.materials_id" + " and u.id = mu.users_id";
 

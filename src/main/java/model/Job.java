@@ -38,6 +38,7 @@ public class Job implements java.io.Serializable {
 		this.jobStatus = jobStatus;
 		this.users = users;
 		this.jobName = jobName;
+		
 	}
 
 	public Job(Customer customers, JobStatus jobStatus, User users, String jobName, Date date, String notes,
