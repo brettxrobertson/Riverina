@@ -1,5 +1,6 @@
 package model;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,9 +96,23 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	}
 
 	@Override
-	public String addCustomer(Request req) {
-		// TODO Auto-generated method stub
-		return null;
+	public void addCustomer(Map<String, String> params) {
+		String sql = "insert into customers (name,address1,address2,address3,state,suburb,postcode) "
+				+ "values(:name,:address1,:address2,:address3,:state,:suburb,:postcode)";
+		
+		try (Connection con = sql2o.open()) {
+		
+			con.createQuery(sql)
+				.addParameter("name", params.get("name"))
+				.addParameter("address1", params.get("address1"))
+				.addParameter("address2", params.get("address2"))
+				.addParameter("address3", params.get("address3"))
+				.addParameter("state", params.get("state"))
+				.addParameter("suburb", params.get("suburb"))
+				.addParameter("postcode", params.get("postcode"))
+				.executeUpdate();
+		}
+		
 	}
 
 	@Override
@@ -127,7 +142,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public List<Job> getAllJobs(Integer page) {
 
 		String paging = "limit " + pageLimit + " offset " + pageLimit * page;
-		
+
 		String sql = "SELECT * from jobs " + paging;
 
 		try (Connection con = sql2o.open()) {
@@ -142,8 +157,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	 */
 	public List<Job> getAllJobsByStatus(JobStatus status) {
 
-		
-		String sql = "SELECT j.* from jobs j, job_status js where j.job_status_id = js.id and js.description = '" + status.getDescription() + "'";
+		String sql = "SELECT j.* from jobs j, job_status js where j.job_status_id = js.id and js.description = '"
+				+ status.getDescription() + "'";
 
 		try (Connection con = sql2o.open()) {
 
@@ -152,7 +167,6 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		}
 	}
 
-	
 	/**
 	 * @return
 	 */
@@ -335,11 +349,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		try (Connection con = sql2o.open()) {
 
 			Long key = con.createQuery(sql, true).addParameter("materialsId", materialsId)
-					.addParameter("usersId", userId)
-					.addParameter("jobId", jobId)
-					.addParameter("materialsId", materialsId)
-					.addParameter("materialsId", materialsId)
-					.executeUpdate().getKey(Long.class);
+					.addParameter("usersId", userId).addParameter("jobId", jobId)
+					.addParameter("materialsId", materialsId).addParameter("materialsId", materialsId).executeUpdate()
+					.getKey(Long.class);
 			insertedId = key;
 		} catch (Sql2oException e) {
 			System.out.println("Failed to insert record");
@@ -385,9 +397,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		int jobid = Integer.parseInt(jobId);
 
 		String sql = "select mu.*,m.cost_price,m.markup_percent, m.description as material_desc,"
-				+ "concat(u.name, ' ', u.surname) as name "
-				+ " from materials_usage mu,  " + " users u, materials m where mu.job_id = " + jobid + " and "
-				+ " m.id = mu.materials_id" + " and u.id = mu.users_id";
+				+ "concat(u.name, ' ', u.surname) as name " + " from materials_usage mu,  "
+				+ " users u, materials m where mu.job_id = " + jobid + " and " + " m.id = mu.materials_id"
+				+ " and u.id = mu.users_id";
 
 		try {
 			try (Connection con = sql2o.open()) {
@@ -396,10 +408,26 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 				list = tableToList(table);
 
 				Iterator<Map<String, Object>> it = list.iterator();
+				
 				while (it.hasNext()) {
 					Map<String, Object> record = it.next();
 
 					measurements = getMUMeasurements(record.get("id").toString());
+
+					// do some fairly dogey calcs for cost. no way i can leave
+					// it like this
+					Double measurementValue = 0.00;
+					for (int i = 0; i < measurements.size(); i++) {
+						if (i == 0) {
+							measurementValue += Double.parseDouble(measurements.get(i).get("measurement").toString());
+						} else {
+							measurementValue *= Double.parseDouble(measurements.get(i).get("measurement").toString());
+						}
+					}
+					measurementValue *= Double.parseDouble(record.get("cost_price").toString());
+					
+					
+					record.put("cost", measurementValue);
 					record.put("measurements", measurements);
 				}
 			}
@@ -407,6 +435,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 			SQLException originalException = (SQLException) e.getCause();
 			System.out.println(originalException);
 		}
+		
+		
 		return list;
 	}
 
@@ -466,11 +496,10 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public void addMaterial(Map<String, String> params) {
 		String sql = "insert into materials (description,cost_price,qty_on_hand,material_types_id,markup_percent) "
 				+ "values(:description,:cost_price,:qty_on_hand,:material_types_id,:markup_percent)";
-		
+
 		String sql_mhmp = "insert into materials_has_measurement_properties (materials_id, measurement_properties_id, measurement)"
 				+ " values(:materials_id, :measurement_properties_id, :measurement)";
-		
-		
+
 		TreeMap<String, Object> treeMap = new TreeMap<String, Object>();
 		treeMap.putAll(params);
 		Map<String, Object> mprops = new TreeMap<String, Object>();
@@ -487,22 +516,23 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.addParameter("markup_percent", params.get("markUp")).executeUpdate().getKey(Integer.class);
 
 			while (it.hasNext()) {
-				
-				Map.Entry<String,Object> pair = (Entry<String, Object>)it.next();
-				
+
+				Map.Entry<String, Object> pair = (Entry<String, Object>) it.next();
+
 				String id = pair.getKey().toString().substring(6);
 				String val = pair.getValue().toString();
-				
-				if(val.equals("")){
+
+				if (val.equals("")) {
 					val = null;
 				}
-				
-				try{
-				int mhmpId = con.createQuery(sql_mhmp).addParameter("materials_id",  materialId)
-						.addParameter("measurement_properties_id", id)
-						.addParameter("measurement", val).executeUpdate().getKey(Integer.class);
-				}catch(Exception e){
-					//swallow the exception here as null value param throws exception
+
+				try {
+					int mhmpId = con.createQuery(sql_mhmp).addParameter("materials_id", materialId)
+							.addParameter("measurement_properties_id", id).addParameter("measurement", val)
+							.executeUpdate().getKey(Integer.class);
+				} catch (Exception e) {
+					// swallow the exception here as null value param throws
+					// exception
 				}
 			}
 

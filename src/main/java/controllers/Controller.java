@@ -154,9 +154,6 @@ public class Controller {
 		// gets User by id JSON
 		get("/service/users/:id", (request, response) -> model.getUser(request.params(":id")), gson::toJson);
 
-		// CUSTOMERS
-		post("/customers", (request, response) -> model.addCustomer(request));
-		get("/customers", (request, response) -> model.getAllCustomers());
 
 		// MATERIALS
 		get("/materialTypes", (request, response) -> {
@@ -338,6 +335,7 @@ public class Controller {
 
 			attributes.put("jobs", model.getJobHeader(request.params(":id")));
 			attributes.put("rows", model.getAllMaterialUsage(request.params(":id")));
+			
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobSummary.ftl"));
 		});
@@ -447,6 +445,44 @@ public class Controller {
 			
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobsList.ftl"));
 		});
+		
+		get("/api/v1/customerEntry", (request, response) -> {
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("session", request.session());
+			
+			return freeMarkerEngine.render(new ModelAndView(attributes, "customerEntry.ftl"));
+			
+		});
+		
+		post("/api/v1/customerEntry", (request, response) -> {
+
+			List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
+
+			Map<String, String> params = toMap(pairs);
+
+			model.addCustomer(params);
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("session", request.session());
+			
+			List<Customer> customers = model.getAllCustomers();
+			attributes.put("customers", customers);
+
+			return freeMarkerEngine.render(new ModelAndView(attributes, "customerList.ftl"));
+		});
+		
+		get("/api/v1/customerList", (request, response) -> {
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("session", request.session());
+			
+			List<Customer> customers = model.getAllCustomers();
+			attributes.put("customers", customers);
+			
+			return freeMarkerEngine.render(new ModelAndView(attributes, "customerList.ftl"));
+			
+		});	
 		
 	}
 

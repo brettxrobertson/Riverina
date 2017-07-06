@@ -5,9 +5,9 @@ import org.sql2o.Sql2o;
 public class Dao {
 	
 	public static Sql2o sql2o;
-	private final static String IP = "172.17.0.2";
+	//private final static String IP = "172.17.0.2";
 	
-	//private final static String IP = "localhost";
+	private final static String IP = "localhost";
     
 
 	static{

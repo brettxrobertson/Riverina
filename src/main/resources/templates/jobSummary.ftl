@@ -63,25 +63,33 @@ html, body {
       <th>Date</th>
       <th>User</th>
       <th>Material</th>
+      <th>Cost Price</th>
       <th>Property</th>
       <th>Value</th>
     </tr>
   </thead>
   <tbody>
+  <#assign sum=0/>
 	 <#list rows as row>
+		<#assign sum = sum + row.cost/>
    		<tr>
    			<td>${row.date}</td>
    			<td>${row.name}</td>
    			<td>${row.material_desc}</td>
+   			<td>${row.cost_price}</td>
    			<td>
    			<#list row.measurements as measurement>
    				${measurement.description} = ${measurement.measurement}<br/>
    			</#list>
    			</td>
-   			<td></td>
+   			<td>${row.cost?string.currency}</td>
    		</tr>
    		
 	</#list>
+	<tr>
+		<td colspan="5"/>
+		<td>${sum?string.currency}</td>
+	</tr>
 	</tbody>
 	</table>
 </div>
