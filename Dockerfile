@@ -18,7 +18,7 @@ RUN apt-get install -y maven
 # RUN ["mvn", "install"]
 
 EXPOSE 4567
-ADD target/riverina-rmi-jar-with-dependencies.jar riverina-rmi-jar-with-dependencies.jar
+#ADD target/riverina-rmi-jar-with-dependencies.jar riverina-rmi-jar-with-dependencies.jar
 
 #ENTRYPOINT ["java","-jar","riverina-rmi-jar-with-dependencies.jar"]
  CMD ["/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-jar", "riverina-rmi-jar-with-dependencies.jar"]
