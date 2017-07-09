@@ -38,8 +38,7 @@
   
   <#list customers as customer>
     <tr>
-      <td>${customer.name}</td>
-      <td>Placehoolder for link to details page</td>
+      <td><a href="/api/v1/customerDetail/${customer.id}">${customer.name}</a></td>
     </tr>
    </#list>  
    </tbody>

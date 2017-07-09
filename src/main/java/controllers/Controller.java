@@ -26,6 +26,8 @@ import model.Sql2oModel;
 import spark.ModelAndView;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
+import utils.CustomerHelper;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -481,6 +483,19 @@ public class Controller {
 			attributes.put("customers", customers);
 			
 			return freeMarkerEngine.render(new ModelAndView(attributes, "customerList.ftl"));
+			
+		});	
+		
+		get("/api/v1/customerDetail/:id", (request, response) -> {
+		
+			Map<String, Object> attributes = new HashMap<>();				
+			attributes.put("session", request.session());
+			
+			attributes.put("customer", model.getCustomerById(Integer.parseInt(request.params(":id"))).get(0));
+			
+			attributes.put("helper", new CustomerHelper(model, Integer.parseInt(request.params(":id"))));
+			
+			return freeMarkerEngine.render(new ModelAndView(attributes, "customerDetail.ftl"));
 			
 		});	
 		

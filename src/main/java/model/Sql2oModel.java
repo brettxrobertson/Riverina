@@ -141,7 +141,11 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	 */
 	public List<Job> getAllJobs(Integer page) {
 
-		String paging = "limit " + pageLimit + " offset " + pageLimit * page;
+		String paging ="";
+		
+		if(page != null){
+			paging = "limit " + pageLimit + " offset " + pageLimit * page;
+		}
 
 		String sql = "SELECT * from jobs " + paging;
 
