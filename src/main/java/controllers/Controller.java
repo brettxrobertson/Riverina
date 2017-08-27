@@ -2,6 +2,7 @@ package controllers;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.*;
 import static spark.Spark.staticFileLocation;
 
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.nio.charset.Charset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Controller {
 
@@ -40,6 +43,8 @@ public class Controller {
 	 * @param model
 	 */
 	public Controller(Sql2oModel model) {
+
+		Logger logger = LoggerFactory.getLogger(Controller.class);
 
 		Spark.exception(Exception.class, (exception, request, response) -> {
 			exception.printStackTrace();
@@ -57,8 +62,13 @@ public class Controller {
 		staticFileLocation("/public");
 
 		get("/", (request, response) -> {
-			response.redirect("initial.html");
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			request.session().invalidate();
+			response.redirect("initial.html");
+
 			return null;
 		});
 
@@ -67,6 +77,9 @@ public class Controller {
 		// ENGINEERS
 		// gets all engineers HTML
 		get("/factoryLogin", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
 
 			response.status(200);
 			response.type("text/html");
@@ -106,6 +119,9 @@ public class Controller {
 		// gets all Jobs HTML
 		get("/jobs", (request, response) -> {
 
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			response.status(200);
 			response.type("text/html");
 
@@ -141,6 +157,10 @@ public class Controller {
 
 		// gets all Users HTML
 		get("/engineers", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			response.status(200);
 			response.type("text/html");
 
@@ -156,9 +176,12 @@ public class Controller {
 		// gets User by id JSON
 		get("/service/users/:id", (request, response) -> model.getUser(request.params(":id")), gson::toJson);
 
-
 		// MATERIALS
 		get("/materialTypes", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			response.status(200);
 			response.type("text/html");
 
@@ -184,6 +207,10 @@ public class Controller {
 		});
 
 		get("/materialTypes/:id", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			response.status(200);
 			response.type("text/html");
 
@@ -240,6 +267,9 @@ public class Controller {
 		// Add material measurements
 		get("/materialMeasurement/:id", (request, response) -> {
 
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			Integer materialId = 0;
 
 			try {
@@ -264,6 +294,10 @@ public class Controller {
 		});
 
 		post("/materialMeasurement", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			response.status(200);
 
 			ObjectMapper mapper = new ObjectMapper();
@@ -323,21 +357,22 @@ public class Controller {
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobSummary.ftl"));
 			// return "hello";
 		});
-		
+
 		// Display a job summary
 		get("/api/v1/jobSummary/:id", (request, response) -> {
-			
-			
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			// Attribute Map for session variables
 			Map<String, Object> attributes = new HashMap<>();
-			
+
 			attributes.put("userScreenDescription", "Job Summary");
 			attributes.put("userScreenHomeLocation", "/");
 			attributes.put("session", request.session());
 
 			attributes.put("jobs", model.getJobHeader(request.params(":id")));
 			attributes.put("rows", model.getAllMaterialUsage(request.params(":id")));
-			
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobSummary.ftl"));
 		});
@@ -356,6 +391,10 @@ public class Controller {
 
 		// Session logout
 		get("/logout", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			request.session().invalidate();
 			response.redirect("/");
 			return null;
@@ -363,6 +402,10 @@ public class Controller {
 
 		// Office data input interface
 		get("/api/v1/jobEntry", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			response.status(200);
 
 			Map<String, Object> attributes = new HashMap<>();
@@ -375,6 +418,9 @@ public class Controller {
 		});
 
 		post("/api/v1/jobEntry", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
 
 			if (request.session().attribute("sessionId") == null) {
 				// swallow
@@ -393,19 +439,22 @@ public class Controller {
 
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-			
+
 			List<model.Job> jobsList = new ArrayList<model.Job>();
 			jobsList.addAll(model.getAllJobsByStatus(new JobStatus("Not Started")));
 			jobsList.addAll(model.getAllJobsByStatus(new JobStatus("Complete")));
 			jobsList.addAll(model.getAllJobsByStatus(new JobStatus("In Progress")));
-			
+
 			attributes.put("jobs", jobsList);
-			
+
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobsList.ftl"));
 		});
-		
+
 		// Office data input interface
 		get("/api/v1/materialsEntry", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
 			response.status(200);
 
 			Map<String, Object> attributes = new HashMap<>();
@@ -424,6 +473,9 @@ public class Controller {
 
 		post("/api/v1/materialsEntry", (request, response) -> {
 
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
 
 			Map<String, String> params = toMap(pairs);
@@ -432,73 +484,105 @@ public class Controller {
 			response.redirect("/");
 			return null;
 		});
-		
-		get("/api/v1/jobList", (request, response) ->{
-			
+
+		get("/api/v1/jobList", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-			
+
 			List<model.Job> jobsList = new ArrayList<model.Job>();
 			jobsList.addAll(model.getAllJobsByStatus(new JobStatus("Not Started")));
 			jobsList.addAll(model.getAllJobsByStatus(new JobStatus("Complete")));
 			jobsList.addAll(model.getAllJobsByStatus(new JobStatus("In Progress")));
-			
+
 			attributes.put("jobs", jobsList);
-			
+
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobsList.ftl"));
 		});
-		
+
 		get("/api/v1/customerEntry", (request, response) -> {
-			
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-			
+
 			return freeMarkerEngine.render(new ModelAndView(attributes, "customerEntry.ftl"));
-			
+
 		});
-		
+
 		post("/api/v1/customerEntry", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
 
 			List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
 
 			Map<String, String> params = toMap(pairs);
 
 			model.addCustomer(params);
-			
+
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-			
+
 			List<Customer> customers = model.getAllCustomers();
 			attributes.put("customers", customers);
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "customerList.ftl"));
 		});
-		
-		get("/api/v1/customerList", (request, response) -> {
+
+		// Update Customer
+		put("/api/v1/customer", (request, response) -> {
+
+			logger.info("Called: " + "method: " + request.requestMethod() + " path: " + request.pathInfo() + " params: "
+					+ request.queryString() + " Body: " + request.body());
+
+			List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
+
+			Map<String, String> params = toMap(pairs);
+			Boolean success = model.updateCustomer(params);
 			
+			if(success){
+				return "Update Successful";
+			}
+			return "Update Unsuccessful";
+		});
+
+		get("/api/v1/customerList", (request, response) -> {
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-			
+
 			List<Customer> customers = model.getAllCustomers();
 			attributes.put("customers", customers);
-			
+
 			return freeMarkerEngine.render(new ModelAndView(attributes, "customerList.ftl"));
-			
-		});	
-		
+
+		});
+
 		get("/api/v1/customerDetail/:id", (request, response) -> {
-		
-			Map<String, Object> attributes = new HashMap<>();				
+
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+
+			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("session", request.session());
-			
+
 			attributes.put("customer", model.getCustomerById(Integer.parseInt(request.params(":id"))).get(0));
-			
+
 			attributes.put("helper", new CustomerHelper(model, Integer.parseInt(request.params(":id"))));
-			
+
 			return freeMarkerEngine.render(new ModelAndView(attributes, "customerDetail.ftl"));
-			
-		});	
-		
+
+		});
+
 	}
 
 	private static Map<String, String> toMap(List<NameValuePair> pairs) {

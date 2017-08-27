@@ -43,9 +43,9 @@
   
  	</head> 
 	<body>
-		<legend>Add Materials Details</legend>
+		<legend>Add Customer Details</legend>
   
-		<form id="materialsEntry" name="customerEntry" method="post" action="/api/v1/customerEntry">
+		<form id="customerEntry" name="customerEntry" method="post" action="/api/v1/customerEntry">
 
 			<div class="form-group  input-group">
 				<span class="input-group-addon"><i class="glyphicon glyphicon-text-background"></i></span>

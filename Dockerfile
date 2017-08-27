@@ -16,8 +16,8 @@ RUN apt-get install -y maven
 
 # Adding source, compile and package into a fat jar
 # ADD src /code/src
- RUN ["mvn", "clean"]
- RUN ["mvn", "install"]
+ #RUN ["mvn", "clean"]
+ #RUN ["mvn", "install"]
 
 EXPOSE 4567
 ADD /target/riverina-rmi-jar-with-dependencies.jar riverina-rmi-jar-with-dependencies.jar

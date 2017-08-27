@@ -10,6 +10,7 @@ model/OperationTypes.class
 model/Components.class
 dao/Dao.class
 controllers/CustomerController.class
+utils/CustomerHelper.class
 controllers/EngineerController.class
 test/CustomerTest.class
 model/Suppliers.class

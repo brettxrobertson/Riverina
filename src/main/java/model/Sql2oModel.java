@@ -12,18 +12,23 @@ import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
 import org.sql2o.data.Table;
 
+import controllers.Controller;
 import controllers.CustomerController;
 import controllers.EngineerController;
 import controllers.UserController;
 import spark.Request;
 
 public class Sql2oModel implements CustomerController, EngineerController, UserController {
-
+	
+	Logger logger = LoggerFactory.getLogger(Sql2oModel.class);
+	
 	private Sql2o sql2o;
 
 	private Integer pageLimit = 8;
@@ -188,6 +193,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.getKey(Integer.class);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -207,7 +213,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		String sql = "select * from material_types where parent_types_id is null limit " + pageLimit + " offset "
 				+ pageLimit * page;
-		System.out.println(sql);
+		
 		try (Connection con = sql2o.open()) {
 
 			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
@@ -263,6 +269,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 		return null;
 
@@ -280,6 +287,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.executeAndFetch(MaterialTypes.class);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 		return null;
 	}
@@ -302,6 +310,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		return null;
@@ -359,8 +368,10 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 			insertedId = key;
 		} catch (Sql2oException e) {
 			System.out.println("Failed to insert record");
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			System.err.println(e.getLocalizedMessage() + e.getMessage());
+			logger.error(e.getMessage());
 		}
 		if (insertedId != null) {
 			addMUmeasurements(payLoadList, insertedId);
@@ -386,6 +397,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		return false;
@@ -438,6 +450,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		} catch (Sql2oException e) {
 			SQLException originalException = (SQLException) e.getCause();
 			System.out.println(originalException);
+			logger.error(originalException.toString());
 		}
 		
 		
@@ -542,12 +555,39 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 	}
 
 	private static SortedMap<String, Object> getByPrefix(NavigableMap<String, Object> myMap, String prefix) {
 		return myMap.subMap(prefix, prefix + Character.MAX_VALUE);
+	}
+
+	public boolean updateCustomer(Map<String, String> params) {
+		// TODO Auto-generated method stub
+		String sql = "update customers set name=:name,address1=:address1,address2=:address2,address3=:address3,state=:state,"
+				+ "suburb=:suburb,postcode=:postcode where id = :id";
+				
+		
+		try (Connection con = sql2o.open()) {
+		
+			con.createQuery(sql)
+				.addParameter("name", params.get("name"))
+				.addParameter("address1", params.get("address1"))
+				.addParameter("address2", params.get("address2"))
+				.addParameter("address3", params.get("address3"))
+				.addParameter("state", params.get("state"))
+				.addParameter("suburb", params.get("suburb"))
+				.addParameter("postcode", params.get("postcode"))
+				.addParameter("id", params.get("id"))
+				.executeUpdate();
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+		
+		
 	}
 
 }
