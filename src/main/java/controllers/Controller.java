@@ -205,7 +205,24 @@ public class Controller {
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "material_types.ftl"));
 		});
-
+		
+		get("/api/v1/materialsList", (request, response) -> {
+			
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+			response.status(200);
+			response.type("text/html");
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("userScreenDescription", "Select Materials");
+			attributes.put("userScreenHomeLocation", "/");
+			
+			attributes.put("materials", model.getAllMaterials());
+			return freeMarkerEngine.render(new ModelAndView(attributes, "materialsList.ftl"));
+			
+		});
+		
+		
 		get("/materialTypes/:id", (request, response) -> {
 
 			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
@@ -448,6 +465,8 @@ public class Controller {
 			attributes.put("jobs", jobsList);
 
 			return freeMarkerEngine.render(new ModelAndView(attributes, "jobsList.ftl"));
+	
+		
 		});
 
 		// Office data input interface

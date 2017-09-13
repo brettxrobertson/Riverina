@@ -244,7 +244,29 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.setAutoDeriveColumnNames(true).executeAndFetch(Materials.class);
 		}
 	}
+	
+	public List<Map<String, Object>> getAllMaterials() {
 
+		String sql = "	SELECT m.*,mt.id as mtId,mt.description as mtDescription FROM rimDB.materials m "
+				+ "left join rimDb.material_types mt on m.material_types_id = mt.id order by mtDescription"; 
+			
+
+		try (Connection con = sql2o.open()) {
+
+			// return
+			Table table = con.createQuery(sql)
+					.executeAndFetchTable();
+
+			return tableToList(table);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
+		}
+		return null;
+
+	}
+	
 	public List<Map<String, Object>> getMaterialsByTypeId(Integer id, Integer page) {
 
 		// String sql = "select m.*,mp.id as measurement_properties_id, " +
