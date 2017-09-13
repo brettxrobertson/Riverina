@@ -248,7 +248,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public List<Map<String, Object>> getAllMaterials() {
 
 		String sql = "	SELECT m.*,mt.id as mtId,mt.description as mtDescription FROM rimDB.materials m "
-				+ "left join rimDb.material_types mt on m.material_types_id = mt.id order by mtDescription"; 
+				+ "left join rimDb.material_types mt on m.material_types_id = mt.id order by mtDescription,m.description"; 
 			
 
 		try (Connection con = sql2o.open()) {
