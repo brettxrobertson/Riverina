@@ -22,13 +22,36 @@
   </head>
   <body>
        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/js/bootstrap.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap-editable/js/bootstrap-editable.js"></script>
     
-    
-  <table class="table table-striped">
+    <script>
+    //turn to inline mode
+		$.fn.editable.defaults.mode = 'inline';
+		
+		
+		
+		$(document).ready(function() {
+   			 $('.editable').editable({
 
+   				 success: function(response, newValue) {
+        			if(response.status == 'error') return response.msg; //msg will be shown in editable form
+        			location.reload();
+   			 }
+		});
+   			
+        
+		});
+		
+    </script>
+    
+<table class="table table-striped">
+<h1>Materials List</h1>
   <thead>
   	<th>Type</th>
   	<th>Description</th>
@@ -37,17 +60,21 @@
   	<th>Sale Price</th>
   	</thead>
   	<tbody>
-  <#list materials as m>
+  	<#list materials as m>
+  	
     <tr>
-      <td class="col-md-3">${m.mtDescription}</td>
-      <td class="col-md-3">${m.description}</td>
-      <td class="col-md-2">$#{m.cost_price?number; m2M2}</td>
-      <td class="col-md-2">${m.markup_percent}</td>
-      <td class="col-md-2">$#{m.sale_price?number; m2M2}</td>
-      <td class="col-md-1"><button type="button" class="btn">Edit</button></td>
+      <td class="col-md-3">${m.mtDescription!}</td>
+      <td class="col-md-3"><a href="#" class="editable" id="description" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter description">${m.description!}</a></td>
+      <td class="col-md-3"><a href="#" class="editable" id="cost_price" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter Cost price">#{m.cost_price!?number; m2M2}</a></td>
+	  <td class="col-md-3"><a href="#" class="editable" id="markup_percent" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter Markup">${m.markup_percent!}</a></td>
+
+     
+
+      <td class="col-md-2">#{m.sale_price!?number; m2M2}</td>
     </tr>
    </#list>  
-   </tbody>
+  	
+  	</tbody>
 </table>
 </body>
 </html>

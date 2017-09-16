@@ -244,11 +244,36 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.setAutoDeriveColumnNames(true).executeAndFetch(Materials.class);
 		}
 	}
+	public boolean updateMaterial(Map<String, String> params){
+		
+		String col = params.get("name");
+		String id = params.get("pk");
+		String val = params.get("value");
+		
+		
+		String sql = "update materials set " + col + " = :colval where id = :id";
+		
+		try (Connection con = sql2o.open()) {
+			
+			con.createQuery(sql)
+			.addParameter("id", params.get("pk"))
+			.addParameter("colval", params.get("value"))
+			.executeUpdate();
+			return true;
+			
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
+		}
+		
+		return false;
+	}
+	
 	
 	public List<Map<String, Object>> getAllMaterials() {
 
 		String sql = "	SELECT m.*,mt.id as mtId,mt.description as mtDescription FROM rimDB.materials m "
-				+ "left join rimDb.material_types mt on m.material_types_id = mt.id order by mtDescription,m.description"; 
+				+ "left join rimDB.material_types mt on m.material_types_id = mt.id order by mtDescription,m.description"; 
 			
 
 		try (Connection con = sql2o.open()) {

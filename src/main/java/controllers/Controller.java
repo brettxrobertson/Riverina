@@ -37,6 +37,8 @@ import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
 public class Controller {
 
 	/**
@@ -206,6 +208,27 @@ public class Controller {
 			return freeMarkerEngine.render(new ModelAndView(attributes, "material_types.ftl"));
 		});
 		
+		
+		post("/api/v1/updateMaterial", (request, response) -> {
+			
+			response.status(200);
+			response.type("text/html");
+			
+			List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
+
+			// Convert pairs to Map
+			Map<String, String> params = toMap(pairs);
+			
+			boolean retVal = model.updateMaterial(params);
+			
+			if(!retVal){
+				response.status(500);
+				return "Failed";
+			}
+			
+			return  "Success";
+		});
+		
 		get("/api/v1/materialsList", (request, response) -> {
 			
 			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
@@ -216,6 +239,8 @@ public class Controller {
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("userScreenDescription", "Select Materials");
 			attributes.put("userScreenHomeLocation", "/");
+			
+			
 			
 			attributes.put("materials", model.getAllMaterials());
 			return freeMarkerEngine.render(new ModelAndView(attributes, "materialsList.ftl"));
