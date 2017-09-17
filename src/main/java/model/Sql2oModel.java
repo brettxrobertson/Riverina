@@ -275,9 +275,12 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		try (Connection con = sql2o.open()) {
 
-			con.createQuery(sql).addParameter("id", params.get("pk")).addParameter("colval", params.get("value"))
-					.executeUpdate();
-			return true;
+			int result = con.createQuery(sql).addParameter("id", params.get("pk"))
+					.addParameter("colval", params.get("value")).executeUpdate().getResult();
+
+			if (result > 0) {
+				return true;
+			}
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

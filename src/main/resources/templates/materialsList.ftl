@@ -99,7 +99,7 @@
   	
     <tr>
       <td class="col-md-3">${m.mtDescription!}</td>
-      <td class="col-md-3"><a href="#" class="editable" id="description" data-type="text" data-pk="ç" data-url="/api/v1/updateMaterial" data-title="Enter description">${m.description!}</a></td>
+      <td class="col-md-3"><a href="#" class="editable" id="description" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter description">${m.description!}</a></td>
       <td class="col-md-3"><a href="#" class="editable" id="cost_price" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter Cost price">#{m.cost_price!?number; m2M2}</a></td>
 	  <td class="col-md-3"><a href="#" class="editable" id="markup_percent" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter Markup">${m.markup_percent!}</a></td>
       <td class="col-md-2">#{m.sale_price!?number; m2M2}</td>
