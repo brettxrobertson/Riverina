@@ -11,28 +11,32 @@
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js">
 		
-		<script>
+	<script>
 		$(document).ready(function(){
-	$("#customer").submit(function(event){
-    event.preventDefault(); //prevent default action 
-    var post_url = $(this).attr("action"); //get form action url
-    var request_method = $(this).attr("method"); //get form GET/POST method
-    var form_data = $(this).serialize(); //Encode form elements for submission
+			$("#customer").submit(function(event){
+    			event.preventDefault(); //prevent default action 
+    			var post_url = $(this).attr("action"); //get form action url
+    			var request_method = $(this).attr("method"); //get form GET/POST method
+    			var form_data = $(this).serialize(); //Encode form elements for submission
     
-    $.ajax({
-        url : post_url,
-        type: request_method,
-        data : form_data
-    }).done(function(response){ // 
+    			$.ajax({
+        			url : post_url,
+        			type: request_method,
+        			data : form_data
+    			}).done(function(response){ // 
        
-    	$('#server-results').html(response).show().fadeOut(3000, function() {
-        $(this).hide();
-    });
+    				$('#server-results').html(response).show().fadeOut(3000, function() {
+        			$(this).hide();
+    				});
 
-    });
-});
-});
-</script>
+    			});
+			});
+		});
+		
+		
+
+		
+	</script>
   
  	</head> 
 	<body>

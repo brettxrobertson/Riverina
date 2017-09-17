@@ -7,7 +7,7 @@ public class Dao {
 	public static Sql2o sql2o;
 	private final static String IP = "172.17.0.2";
 	
-	//ßprivate final static String IP = "localhost";
+	//private final static String IP = "localhost";
     
 
 	static{	

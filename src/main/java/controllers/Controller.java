@@ -229,6 +229,16 @@ public class Controller {
 			return  "Success";
 		});
 		
+		delete("/api/v1/material/:id", (request, response) -> {
+			response.status(200);
+			response.type("text/html");
+			
+			Integer id = Integer.parseInt(request.params(":id"));
+			
+			boolean result = model.deleteMaterial(id);
+			return "";
+		});
+		
 		get("/api/v1/materialsList", (request, response) -> {
 			
 			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),

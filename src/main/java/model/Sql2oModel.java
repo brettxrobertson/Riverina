@@ -26,9 +26,9 @@ import controllers.UserController;
 import spark.Request;
 
 public class Sql2oModel implements CustomerController, EngineerController, UserController {
-	
+
 	Logger logger = LoggerFactory.getLogger(Sql2oModel.class);
-	
+
 	private Sql2o sql2o;
 
 	private Integer pageLimit = 8;
@@ -104,20 +104,16 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public void addCustomer(Map<String, String> params) {
 		String sql = "insert into customers (name,address1,address2,address3,state,suburb,postcode) "
 				+ "values(:name,:address1,:address2,:address3,:state,:suburb,:postcode)";
-		
+
 		try (Connection con = sql2o.open()) {
-		
-			con.createQuery(sql)
-				.addParameter("name", params.get("name"))
-				.addParameter("address1", params.get("address1"))
-				.addParameter("address2", params.get("address2"))
-				.addParameter("address3", params.get("address3"))
-				.addParameter("state", params.get("state"))
-				.addParameter("suburb", params.get("suburb"))
-				.addParameter("postcode", params.get("postcode"))
-				.executeUpdate();
+
+			con.createQuery(sql).addParameter("name", params.get("name"))
+					.addParameter("address1", params.get("address1")).addParameter("address2", params.get("address2"))
+					.addParameter("address3", params.get("address3")).addParameter("state", params.get("state"))
+					.addParameter("suburb", params.get("suburb")).addParameter("postcode", params.get("postcode"))
+					.executeUpdate();
 		}
-		
+
 	}
 
 	@Override
@@ -146,9 +142,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	 */
 	public List<Job> getAllJobs(Integer page) {
 
-		String paging ="";
-		
-		if(page != null){
+		String paging = "";
+
+		if (page != null) {
 			paging = "limit " + pageLimit + " offset " + pageLimit * page;
 		}
 
@@ -213,13 +209,37 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		String sql = "select * from material_types where parent_types_id is null limit " + pageLimit + " offset "
 				+ pageLimit * page;
-		
+
 		try (Connection con = sql2o.open()) {
 
 			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
 					.executeAndFetch(MaterialTypes.class);
 		}
 
+	}
+
+	public boolean deleteMaterial(Integer id) {
+
+		String sql = "delete from materials where id = :id";
+
+		List<Map<String, Object>> usage = null;
+		try {
+			usage = getAllMaterialUsage(id.toString());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+		if (usage.size() > 0) {
+			return false;
+		} else {
+			try (Connection con = sql2o.open()) {
+				int createId = con.createQuery(sql).addParameter("id", id).executeUpdate().getResult();
+			}
+		}
+
+		return false;
 	}
 
 	public List<MaterialTypes> getMaterialTypesById(int id) {
@@ -244,43 +264,38 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					.setAutoDeriveColumnNames(true).executeAndFetch(Materials.class);
 		}
 	}
-	public boolean updateMaterial(Map<String, String> params){
-		
+
+	public boolean updateMaterial(Map<String, String> params) {
+
 		String col = params.get("name");
 		String id = params.get("pk");
 		String val = params.get("value");
-		
-		
+
 		String sql = "update materials set " + col + " = :colval where id = :id";
-		
+
 		try (Connection con = sql2o.open()) {
-			
-			con.createQuery(sql)
-			.addParameter("id", params.get("pk"))
-			.addParameter("colval", params.get("value"))
-			.executeUpdate();
+
+			con.createQuery(sql).addParameter("id", params.get("pk")).addParameter("colval", params.get("value"))
+					.executeUpdate();
 			return true;
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			logger.error(e.getMessage());
 		}
-		
+
 		return false;
 	}
-	
-	
+
 	public List<Map<String, Object>> getAllMaterials() {
 
 		String sql = "	SELECT m.*,mt.id as mtId,mt.description as mtDescription FROM rimDB.materials m "
-				+ "left join rimDB.material_types mt on m.material_types_id = mt.id order by mtDescription,m.description"; 
-			
+				+ "left join rimDB.material_types mt on m.material_types_id = mt.id order by mtDescription,m.description";
 
 		try (Connection con = sql2o.open()) {
 
 			// return
-			Table table = con.createQuery(sql)
-					.executeAndFetchTable();
+			Table table = con.createQuery(sql).executeAndFetchTable();
 
 			return tableToList(table);
 
@@ -291,7 +306,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		return null;
 
 	}
-	
+
 	public List<Map<String, Object>> getMaterialsByTypeId(Integer id, Integer page) {
 
 		// String sql = "select m.*,mp.id as measurement_properties_id, " +
@@ -471,7 +486,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 				list = tableToList(table);
 
 				Iterator<Map<String, Object>> it = list.iterator();
-				
+
 				while (it.hasNext()) {
 					Map<String, Object> record = it.next();
 
@@ -488,8 +503,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 						}
 					}
 					measurementValue *= Double.parseDouble(record.get("cost_price").toString());
-					
-					
+
 					record.put("cost", measurementValue);
 					record.put("measurements", measurements);
 				}
@@ -499,8 +513,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 			System.out.println(originalException);
 			logger.error(originalException.toString());
 		}
-		
-		
+
 		return list;
 	}
 
@@ -615,26 +628,19 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		// TODO Auto-generated method stub
 		String sql = "update customers set name=:name,address1=:address1,address2=:address2,address3=:address3,state=:state,"
 				+ "suburb=:suburb,postcode=:postcode where id = :id";
-				
-		
+
 		try (Connection con = sql2o.open()) {
-		
-			con.createQuery(sql)
-				.addParameter("name", params.get("name"))
-				.addParameter("address1", params.get("address1"))
-				.addParameter("address2", params.get("address2"))
-				.addParameter("address3", params.get("address3"))
-				.addParameter("state", params.get("state"))
-				.addParameter("suburb", params.get("suburb"))
-				.addParameter("postcode", params.get("postcode"))
-				.addParameter("id", params.get("id"))
-				.executeUpdate();
+
+			con.createQuery(sql).addParameter("name", params.get("name"))
+					.addParameter("address1", params.get("address1")).addParameter("address2", params.get("address2"))
+					.addParameter("address3", params.get("address3")).addParameter("state", params.get("state"))
+					.addParameter("suburb", params.get("suburb")).addParameter("postcode", params.get("postcode"))
+					.addParameter("id", params.get("id")).executeUpdate();
 			return true;
-		}catch(Exception e){
+		} catch (Exception e) {
 			return false;
 		}
-		
-		
+
 	}
 
 }
