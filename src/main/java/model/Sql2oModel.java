@@ -236,6 +236,10 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		} else {
 			try (Connection con = sql2o.open()) {
 				int createId = con.createQuery(sql).addParameter("id", id).executeUpdate().getResult();
+				
+				if(createId >0 ){
+					return true;
+				}
 			}
 		}
 
@@ -338,6 +342,13 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		}
 		return null;
 
+	}
+	
+	public boolean addMaterialType(Map<String, String> params){
+		
+		String sql = "insert into material";
+		
+		return false;
 	}
 
 	public List<MaterialTypes> getMaterialTypeChildren(Integer id, Integer page) {
@@ -507,7 +518,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					}
 					measurementValue *= Double.parseDouble(record.get("cost_price").toString());
 
-					record.put("cost", measurementValue);
+					record.put("cost", measurementValue/1000);
 					record.put("measurements", measurements);
 				}
 			}

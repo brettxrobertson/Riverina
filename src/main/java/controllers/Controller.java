@@ -236,6 +236,7 @@ public class Controller {
 			Integer id = Integer.parseInt(request.params(":id"));
 			
 			boolean result = model.deleteMaterial(id);
+			
 			return "";
 		});
 		
@@ -535,7 +536,7 @@ public class Controller {
 			Map<String, String> params = toMap(pairs);
 
 			model.addMaterial(params);
-			response.redirect("/");
+			response.redirect("/api/v1/materialsList");
 			return null;
 		});
 
