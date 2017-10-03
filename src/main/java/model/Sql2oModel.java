@@ -488,7 +488,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 		int jobid = Integer.parseInt(jobId);
 
-		String sql = "select mu.*,m.cost_price,m.markup_percent, m.description as material_desc,"
+		String sql = "select mu.*,m.cost_price,m.sale_price, m.markup_percent, m.description as material_desc,"
 				+ "concat(u.name, ' ', u.surname) as name " + " from materials_usage mu,  "
 				+ " users u, materials m where mu.job_id = " + jobid + " and " + " m.id = mu.materials_id"
 				+ " and u.id = mu.users_id";
@@ -509,6 +509,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					// do some fairly dogey calcs for cost. no way i can leave
 					// it like this
 					Double measurementValue = 0.00;
+					
+					Double saleValue = 0.00;
+					
 					for (int i = 0; i < measurements.size(); i++) {
 						if (i == 0) {
 							measurementValue += Double.parseDouble(measurements.get(i).get("measurement").toString());
@@ -516,9 +519,14 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 							measurementValue *= Double.parseDouble(measurements.get(i).get("measurement").toString());
 						}
 					}
+					
+					saleValue = measurementValue * Double.parseDouble(record.get("sale_price").toString());
+					
 					measurementValue *= Double.parseDouble(record.get("cost_price").toString());
-
+					
+					
 					record.put("cost", measurementValue/1000);
+					record.put("sale_value", saleValue/1000);
 					record.put("measurements", measurements);
 				}
 			}

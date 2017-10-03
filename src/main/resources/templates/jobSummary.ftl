@@ -64,31 +64,38 @@ html, body {
       <th>User</th>
       <th>Material</th>
       <th>Cost Price</th>
+      <th>Markup</th>
       <th>Property</th>
-      <th>Value</th>
+      <!-- <th>Cost Value</th> -->
+      <th>Sale Value</th>
     </tr>
   </thead>
   <tbody>
-  <#assign sum=0/>
+  <#assign cost_sum=0/>
+  <#assign sale_sum=0/>
 	 <#list rows as row>
-		<#assign sum = sum + row.cost/>
+		<#assign cost_sum = cost_sum + row.cost/>
+		<#assign sale_sum = sale_sum + row.sale_value/>
    		<tr>
    			<td>${row.date}</td>
    			<td>${row.name}</td>
    			<td>${row.material_desc}</td>
    			<td>${row.cost_price}</td>
+   			<td>${row.markup_percent}</td>
    			<td>
    			<#list row.measurements as measurement>
    				${measurement.description} = ${measurement.measurement}<br/>
    			</#list>
    			</td>
-   			<td>${row.cost?string.currency}</td>
+   			<!-- <td>${row.cost?string.currency}</td> -->
+   			<td>${row.sale_value?string.currency}</td>
    		</tr>
    		
 	</#list>
 	<tr>
-		<td colspan="5"/>
-		<td>${sum?string.currency}</td>
+		<td colspan="6"/>
+		<!-- <td>${cost_sum?string.currency}</td> -->
+		<td>${sale_sum?string.currency}</td>
 	</tr>
 	</tbody>
 	</table>
