@@ -252,7 +252,7 @@ public class Controller {
 			attributes.put("userScreenHomeLocation", "/");
 			
 			
-			
+			attributes.put("material_types", model.getAllMaterialTypesWithoutChildren());
 			attributes.put("materials", model.getAllMaterials());
 			return freeMarkerEngine.render(new ModelAndView(attributes, "materialsList.ftl"));
 			
@@ -516,7 +516,7 @@ public class Controller {
 			attributes.put("session", request.session());
 
 			// Add list of materialTypes to attributes
-			List<MaterialTypes> materialTypes = model.getAllMaterialTypes();
+			List<MaterialTypes> materialTypes = model.getAllMaterialTypesWithoutChildren();
 			attributes.put("materialTypes", materialTypes);
 
 			// Add list of materialTypes to attributes
@@ -539,7 +539,39 @@ public class Controller {
 			response.redirect("/api/v1/materialsList");
 			return null;
 		});
-
+		
+		get("/api/v1/materialTypesEntry", (request,response) -> {
+			
+			//Log stuff
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+			
+			Map<String, Object> attributes = new HashMap<>();
+			attributes.put("session", request.session());
+				
+			attributes.put("parent_material_types", model.getMaterialTypesWithoutChildren());
+			
+			
+			return freeMarkerEngine.render(new ModelAndView(attributes, "MaterialTypesEntry.ftl"));
+		});
+		
+		post("/api/v1/materialTypes", (request,response) -> {
+			
+			//Log stuff
+			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),
+					request.queryString()+ " Body: " + request.body());
+			
+			//Get the parameters from the body put into map
+			List<NameValuePair> pairs = URLEncodedUtils.parse(request.body(), Charset.defaultCharset());
+			Map<String, String> params = toMap(pairs);
+			
+			model.addMaterialType(params);
+			
+			response.redirect("/api/v1/materialsEntry");
+			return null;
+		});
+		
+		
 		get("/api/v1/jobList", (request, response) -> {
 
 			logger.info("Called: method: {}  path: {} params: {}", request.requestMethod(), request.pathInfo(),

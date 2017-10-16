@@ -205,10 +205,35 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	}
 
+	public List<MaterialTypes> getAllMaterialTypesWithoutChildren() {
+
+		String sql = "select mt.* from material_types mt where mt.id NOT IN (select parent_types_id from material_types "
+				+ "where parent_types_id IS NOT NULL)";
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
+					.executeAndFetch(MaterialTypes.class);
+		}
+
+	}
+
 	public List<MaterialTypes> getAllParentMaterialTypes(Integer page) {
 
 		String sql = "select * from material_types where parent_types_id is null limit " + pageLimit + " offset "
 				+ pageLimit * page;
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql).throwOnMappingFailure(false).setAutoDeriveColumnNames(true)
+					.executeAndFetch(MaterialTypes.class);
+		}
+
+	}
+
+	public List<MaterialTypes> getAllParentMaterialTypes() {
+
+		String sql = "select * from material_types where parent_types_id is null limit ";
 
 		try (Connection con = sql2o.open()) {
 
@@ -236,8 +261,8 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		} else {
 			try (Connection con = sql2o.open()) {
 				int createId = con.createQuery(sql).addParameter("id", id).executeUpdate().getResult();
-				
-				if(createId >0 ){
+
+				if (createId > 0) {
 					return true;
 				}
 			}
@@ -343,12 +368,36 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 		return null;
 
 	}
-	
-	public boolean addMaterialType(Map<String, String> params){
-		
-		String sql = "insert into material";
-		
+
+	public boolean addMaterialType(Map<String, String> params) {
+
+		String sql = "insert into materialTypes (description, parent_types_id) "
+				+ "values(:description, :parent_types_id)";
+
+		try (Connection con = sql2o.open()) {
+			int materialTypeId = con.createQuery(sql).addParameter("description", params.get("description"))
+					.addParameter("parent_types_id", params.get("parent_types_id")).executeUpdate()
+					.getKey(Integer.class);
+			if (materialTypeId == 1) {
+				return true;
+			}
+		}
 		return false;
+	}
+
+	public List<MaterialTypes> getMaterialTypesWithoutChildren() {
+
+		String sql = "select mt.* from material_types mt "
+				+ "where mt.id NOT IN (select material_types_id from materials where material_types_id IS NOT NULL)";
+
+		try (Connection con = sql2o.open()) {
+
+			return con.createQuery(sql).setAutoDeriveColumnNames(true).executeAndFetch(MaterialTypes.class);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
+		}
+		return null;
 	}
 
 	public List<MaterialTypes> getMaterialTypeChildren(Integer id, Integer page) {
@@ -509,9 +558,9 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 					// do some fairly dogey calcs for cost. no way i can leave
 					// it like this
 					Double measurementValue = 0.00;
-					
+
 					Double saleValue = 0.00;
-					
+
 					for (int i = 0; i < measurements.size(); i++) {
 						if (i == 0) {
 							measurementValue += Double.parseDouble(measurements.get(i).get("measurement").toString());
@@ -519,14 +568,13 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 							measurementValue *= Double.parseDouble(measurements.get(i).get("measurement").toString());
 						}
 					}
-					
+
 					saleValue = measurementValue * Double.parseDouble(record.get("sale_price").toString());
-					
+
 					measurementValue *= Double.parseDouble(record.get("cost_price").toString());
-					
-					
-					record.put("cost", measurementValue/1000);
-					record.put("sale_value", saleValue/1000);
+
+					record.put("cost", measurementValue / 1000);
+					record.put("sale_value", saleValue / 1000);
 					record.put("measurements", measurements);
 				}
 			}

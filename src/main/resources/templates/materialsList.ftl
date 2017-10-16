@@ -61,6 +61,17 @@
     		})
   		})
 		
+		$(function(){
+    $('#materialtype').editable({
+            
+       
+        source: [
+              
+           
+        	
+           ]
+    });
+});
 		
     </script>
     <script>
@@ -95,10 +106,11 @@
   	</div>
   	</thead>
   	<tbody>
+  	<div id="accordion" role="tablist" aria-multiselectable="true">
   	<#list materials as m>
   	
     <tr>
-      <td class="col-md-3">${m.mtDescription!}</td>
+      <td class="col-md-2"><a href="#" id="material_types_id" data-url="/api/v1/updateMaterial" data-type="select" data-pk="${m.id}" data-value="" data-source="[<#list material_types as mt>{value: '${mt.id}',text: '${mt.description}'},</#list>]" data-title="Select type" class="editable editable-click" data-original-title="" title="">${m.mtDescription!}</a>
       <td class="col-md-3"><a href="#" class="editable" id="description" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter description">${m.description!}</a></td>
       <td class="col-md-3"><a href="#" class="editable" id="cost_price" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter Cost price">#{m.cost_price!?number; m2M2}</a></td>
 	  <td class="col-md-3"><a href="#" class="editable" id="markup_percent" data-type="text" data-pk="${m.id}" data-url="/api/v1/updateMaterial" data-title="Enter Markup">${m.markup_percent!}</a></td>
