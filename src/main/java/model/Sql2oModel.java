@@ -208,7 +208,7 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 	public List<MaterialTypes> getAllMaterialTypesWithoutChildren() {
 
 		String sql = "select mt.* from material_types mt where mt.id NOT IN (select parent_types_id from material_types "
-				+ "where parent_types_id IS NOT NULL)";
+				+ "where parent_types_id IS NOT NULL) order by mt.description";
 
 		try (Connection con = sql2o.open()) {
 
