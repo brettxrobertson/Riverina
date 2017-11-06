@@ -371,12 +371,18 @@ public class Sql2oModel implements CustomerController, EngineerController, UserC
 
 	public boolean addMaterialType(Map<String, String> params) {
 
-		String sql = "insert into materialTypes (description, parent_types_id) "
+		String sql = "insert into material_types (description, parent_types_id) "
 				+ "values(:description, :parent_types_id)";
-
+		
+		Integer parentTypesId = null;
+		
+		if(!"".equals(params.get("parent_types_id"))){
+			parentTypesId = Integer.parseInt(params.get("parent_types_id"));
+		}
+		
 		try (Connection con = sql2o.open()) {
 			int materialTypeId = con.createQuery(sql).addParameter("description", params.get("description"))
-					.addParameter("parent_types_id", params.get("parent_types_id")).executeUpdate()
+					.addParameter("parent_types_id", parentTypesId).executeUpdate()
 					.getKey(Integer.class);
 			if (materialTypeId == 1) {
 				return true;

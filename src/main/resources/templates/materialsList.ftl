@@ -20,6 +20,10 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 <style>
+.zebra:nth-child(odd) {
+    background: #e0e0e0;
+}
+
 .mehide {
 	display: none;
 }
@@ -143,7 +147,7 @@
 					<div class="card-block">
 					<#list materials as m> 
 					<#if type.id == m.mtId>
-						<div class="row">
+						<div class="row zebra mh-100">
 							<div class="col-md-2">
 								<a href="#" id="material_types_id"
 									data-url="/api/v1/updateMaterial" data-type="select"
