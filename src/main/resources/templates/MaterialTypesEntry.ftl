@@ -16,7 +16,7 @@
 
 
 
-  <legend>Add Job Details</legend>
+  <legend>Add Material Types</legend>
  <form id="material_type_entry" action="/api/v1/materialTypes" method="POST">
 	 
 	
@@ -25,7 +25,7 @@
      	<input type="text" class="form-control" name="description" id="jobDescription" placeholder="Type description">
     </div>
    <div class="form-group  input-group">
-     	<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+     	<span class="input-group-addon"><i class="glyphicon glyphicon-chevron-up"></i></span>
      	<select name="parent_types_id" class="form-control" id="customerDD">
      		<option value="" selected="selected">Select Parent Type</option>
      		<#list parent_material_types as material_type>
